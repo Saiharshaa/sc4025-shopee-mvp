@@ -31,7 +31,7 @@ export default function CartPage() {
     <section>
       <h1 className="text-2xl font-bold">Cart ({breakdown.itemCount})</h1>
 
-      <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_320px]">
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
         <ul className="divide-y divide-gray-200 rounded-lg bg-white shadow-sm">
           {cart.items.map(({ product, quantity }) => (
             <li key={product.id} className="flex gap-4 p-4">

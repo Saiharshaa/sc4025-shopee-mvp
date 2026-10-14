@@ -56,7 +56,7 @@ export default function CheckoutPage() {
     <section>
       <h1 className="text-2xl font-bold">Checkout</h1>
 
-      <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-4">
           <div className="rounded-lg bg-white p-4 shadow-sm">
             <h2 className="font-semibold">Delivery address</h2>
@@ -74,11 +74,10 @@ export default function CheckoutPage() {
             <h2 className="font-semibold">Items</h2>
             <ul className="mt-2 divide-y divide-gray-100 text-sm">
               {breakdown.lines.map((line) => (
-                <li key={line.productId} className="flex justify-between gap-4 py-2">
-                  <span className="min-w-0 truncate">
-                    {line.title} <span className="text-gray-500">× {line.quantity}</span>
-                  </span>
-                  <span className="flex-none">{formatRupees(line.lineTotal)}</span>
+                <li key={line.productId} className="flex gap-2 py-2">
+                  <span className="min-w-0 flex-1 truncate">{line.title}</span>
+                  <span className="flex-none text-gray-500">× {line.quantity}</span>
+                  <span className="w-16 flex-none text-right">{formatRupees(line.lineTotal)}</span>
                 </li>
               ))}
             </ul>
