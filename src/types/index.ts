@@ -117,7 +117,7 @@ export interface VoucherBreakdown {
   ineligibleReason?: VoucherIneligibleReason
   /** Rupees still needed to reach minSpend. 0 when eligible. */
   shortfall: number
-  /** Discount before the max cap / subtotal clamp (percentage is already floored). */
+  /** Discount before the max cap / subtotal clamp (percentage is already floored). 0 when ineligible. */
   rawDiscount: number
   /** Discount actually applied. */
   discount: number
