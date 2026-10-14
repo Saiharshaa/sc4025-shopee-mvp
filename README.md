@@ -35,7 +35,7 @@ npm run dev          # http://localhost:5173
 `main` auto-deploys to Vercel. Config is in `vercel.json`; its rewrite rule
 makes deep links like `/cart` survive a page reload.
 
-**Live demo:** _URL added after first deploy_
+**Live demo:** https://sc4025-shopee-mvp.vercel.app (the dashboard is at https://vercel.com/mvp-d795/sc4025-shopee-mvp)
 
 Vercel's free plan only builds commits authored by the repo owner when the
 repo is private. So:
