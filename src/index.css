@@ -1,0 +1,16 @@
+@import 'tailwindcss';
+
+/*
+ * Theme tokens. OWNER: Person 3 (Designer) — the design system lives here and
+ * in src/components/ui/. Only a brand colour is defined so the scaffold has
+ * something to render with; Person 3 is free to replace all of it.
+ */
+@theme {
+  --color-brand: #ee4d2d;
+  --color-brand-dark: #d73211;
+  --color-brand-light: #fff1ed;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
