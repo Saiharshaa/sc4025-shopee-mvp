@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Home &amp; Living placeholder">
+  <rect width="400" height="400" fill="#fff3e0"/>
+  <rect x="140" y="120" width="120" height="110" rx="14" fill="none" stroke="#a85a00" stroke-width="8" opacity="0.5"/>
+  <path d="M170 120v-14a30 30 0 0 1 60 0v14" fill="none" stroke="#a85a00" stroke-width="8" opacity="0.5"/>
+  <text x="200" y="290" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" font-weight="600" fill="#a85a00">Home &amp; Living</text>
+</svg>
