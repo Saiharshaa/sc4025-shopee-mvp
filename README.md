@@ -30,6 +30,22 @@ npm run dev          # http://localhost:5173
 
 **Before opening a PR, run:** `npm run build && npm test && npm run lint`
 
+### Deployment
+
+`main` auto-deploys to Vercel. Config is in `vercel.json`; its rewrite rule
+makes deep links like `/cart` survive a page reload.
+
+**Live demo:** _URL added after first deploy_
+
+Vercel's free plan only builds commits authored by the repo owner when the
+repo is private. So:
+
+- Merges into `main` **do** deploy, because the merge commit is authored by
+  Person 4, who merges.
+- Teammates' PRs **don't** get Vercel preview links. Check your work locally
+  with `npm run dev`, or `npm run build && npm run preview` for the
+  production build.
+
 ---
 
 ## Team & ownership
