@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router'
+import { useCart } from '../../context/useCart'
 
 /**
  * Shared header + primary nav.
@@ -13,6 +14,8 @@ const NAV_ITEMS = [
 ]
 
 export default function Header() {
+  const { itemCount } = useCart()
+
   return (
     <header className="sticky top-0 z-10 bg-brand text-white shadow">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
@@ -31,6 +34,12 @@ export default function Header() {
                   }
                 >
                   {item.label}
+                  {item.to === '/cart' && itemCount > 0 && (
+                    <span className="ml-1.5 rounded-full bg-white px-1.5 py-0.5 text-xs font-bold text-brand">
+                      <span className="sr-only">, items: </span>
+                      {itemCount}
+                    </span>
+                  )}
                 </NavLink>
               </li>
             ))}
