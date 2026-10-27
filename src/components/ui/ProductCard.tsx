@@ -22,7 +22,7 @@ export default function ProductCard({ product, availability }: Props) {
   return (
     <Link
       to={`/product/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="group relative flex flex-col overflow-hidden rounded-lg bg-white shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="relative aspect-square bg-gray-100">
         <img src={product.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
