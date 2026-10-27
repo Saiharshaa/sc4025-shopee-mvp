@@ -1,3 +1,5 @@
+import type { PaymentMethod } from '../types'
+
 /** Shared display helpers. OWNER: Person 4 (Tech Lead). */
 
 const rupees = new Intl.NumberFormat('en-IN', {
@@ -23,4 +25,24 @@ const istDate = new Intl.DateTimeFormat('en-IN', {
 /** "2027-03-31T23:59:59+05:30" -> "31 Mar 2027" (in IST, whatever the device timezone). */
 export function formatDate(iso: string): string {
   return istDate.format(new Date(iso))
+}
+
+const istDateTime = new Intl.DateTimeFormat('en-IN', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZone: 'Asia/Kolkata',
+})
+
+/** "2026-10-27T12:30:00+05:30" -> "27 Oct 2026, 12:30 pm" (in IST). */
+export function formatDateTime(iso: string): string {
+  return istDateTime.format(new Date(iso))
+}
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  shopeepay: 'ShopeePay (UPI)',
+  upi: 'UPI',
+  cod: 'Cash on delivery',
 }

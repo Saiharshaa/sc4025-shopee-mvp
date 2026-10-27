@@ -237,6 +237,8 @@ export interface OrderItem {
   unitPrice: number
   quantity: number
   speedTier: SpeedTier
+  /** Blinkit dark store this item was sent from. Absent when the seller ships it. */
+  darkStoreId?: string
 }
 
 /** Flat snapshot of the pricing breakdown at the moment the order was placed. */
