@@ -60,7 +60,7 @@ export default function CheckoutPage() {
     try {
       const order = placeOrder(cart, breakdown, address, paymentMethod)
       clearCart()
-      navigate(`/orders/${order.id}`)
+      navigate(`/orders/${order.id}`, { state: { justPlaced: true } })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not place the order')
     }
