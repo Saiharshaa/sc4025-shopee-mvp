@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useCart } from '../../context/useCart'
 import { formatRupees } from '../../lib/format'
-import { calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
+import { calculateCashback, calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
 import { getCoinBalance, getUser, getVouchers, placeOrder } from '../../mocks'
+import type { PaymentMethod } from '../../types'
+import PaymentMethodPicker from './PaymentMethodPicker'
 import PriceBreakdown from './PriceBreakdown'
 import VoucherPicker from './VoucherPicker'
 
 /**
  * Route:  /checkout
  * OWNER:  Person 4 (Tech Lead)
- * Scope:  Checkout with voucher + coin stacking. All money maths lives in
+ * Scope:  Checkout with voucher + coin stacking and the payment method
+ *         (ShopeePay earns Coins back). All money maths lives in
  *         src/lib/pricing.ts; this page only collects choices and displays
  *         the breakdown.
  */
@@ -19,6 +22,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate()
   const [voucherCode, setVoucherCode] = useState<string | null>(null)
   const [useCoins, setUseCoins] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('shopeepay')
   const [error, setError] = useState<string | null>(null)
 
   if (cart.items.length === 0) {
@@ -41,10 +45,20 @@ export default function CheckoutPage() {
   // The engine caps coins; we only make sure we never ask for more than the user holds.
   const breakdown = calculateOrderTotal(cart, voucher, useCoins ? coinBalance : 0)
   const maxUsableCoins = Math.min(coinBalance, breakdown.coins.cap)
+  const shopeePayCoins = calculateCashback(breakdown.total, 'shopeepay').coinsEarned
+  const coinsEarned = calculateCashback(breakdown.total, paymentMethod).coinsEarned
+
+  const total = formatRupees(breakdown.total)
+  const payLabel =
+    breakdown.total === 0
+      ? 'Place order'
+      : { shopeepay: `Pay ${total} with ShopeePay`, upi: `Pay ${total} by UPI`, cod: `Place order · pay ${total} on delivery` }[
+          paymentMethod
+        ]
 
   function handlePlaceOrder() {
     try {
-      const order = placeOrder(cart, breakdown, address, 'upi')
+      const order = placeOrder(cart, breakdown, address, paymentMethod)
       clearCart()
       navigate(`/orders/${order.id}`)
     } catch (e) {
@@ -108,10 +122,22 @@ export default function CheckoutPage() {
               <span className="text-sm font-medium text-brand">−{formatRupees(maxUsableCoins)}</span>
             </label>
           </div>
+
+          <PaymentMethodPicker selected={paymentMethod} onSelect={setPaymentMethod} shopeePayCoins={shopeePayCoins} />
         </div>
 
         <aside className="h-fit rounded-lg bg-white p-4 shadow-sm lg:sticky lg:top-20">
           <PriceBreakdown breakdown={breakdown} />
+          {coinsEarned > 0 ? (
+            <p className="mt-3 rounded bg-brand-light p-2 text-sm text-brand-dark">
+              You'll earn <strong>{coinsEarned} Shopee Coins</strong> with ShopeePay, worth {formatRupees(coinsEarned)} off
+              a future order.
+            </p>
+          ) : (
+            shopeePayCoins > 0 && (
+              <p className="mt-3 text-xs text-gray-500">Paying with ShopeePay would earn {shopeePayCoins} Coins on this order.</p>
+            )
+          )}
           {error && (
             <p role="alert" className="mt-3 rounded bg-red-50 p-2 text-sm text-red-700">
               {error}
@@ -122,7 +148,7 @@ export default function CheckoutPage() {
             onClick={handlePlaceOrder}
             className="mt-4 w-full rounded bg-brand py-2.5 font-semibold text-white hover:bg-brand-dark"
           >
-            Place order
+            {payLabel}
           </button>
         </aside>
       </div>
