@@ -231,3 +231,57 @@ export interface Order {
   /** Oldest first. The last event's status equals `status`. */
   timeline: OrderEvent[]
 }
+
+// ---------------------------------------------------------------------------
+// Blinkit inventory (Shopee Global Picks)
+// ---------------------------------------------------------------------------
+
+/**
+ * A brand-authorised Indian importer. It is the seller of record and owns the
+ * stock that sits in Blinkit's dark stores.
+ */
+export interface Vendor {
+  id: string
+  /** Display name. Equals `Product.seller` on every product this vendor holds. */
+  name: string
+  legalName: string
+  city: string
+  /** Brands that have authorised this importer to sell in India. */
+  authorisedBrands: string[]
+  /** CDSCO cosmetics import registration certificate (Form COS-2). */
+  importRegistration: {
+    number: string
+    /** ISO 8601 timestamp. */
+    validUntil: string
+  }
+  /** Importer-Exporter Code issued by DGFT. */
+  iec: string
+  gstin: string
+  /** ISO 8601 date the vendor joined Global Picks. */
+  onboardedAt: string
+}
+
+export interface DarkStore {
+  id: string
+  name: string
+  /** Short locality name, used as a column header. */
+  area: string
+  city: string
+  /** Typical door-to-door time for shoppers this store serves. */
+  avgDeliveryMinutes: number
+}
+
+/** Units of one product that one vendor keeps in one dark store. */
+export interface StockRecord {
+  vendorId: string
+  productId: string
+  darkStoreId: string
+  /** Integer ≥ 0. */
+  units: number
+  /** ISO 8601 timestamp. */
+  lastRestockedAt: string
+}
+
+export type StockStatus = 'in-stock' | 'low' | 'out'
+
+export type RegistrationStatus = 'valid' | 'renewal-due' | 'expired'

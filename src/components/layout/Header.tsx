@@ -9,6 +9,7 @@ import { useCart } from '../../context/useCart'
 const NAV_ITEMS = [
   { to: '/', label: 'Home', end: true },
   { to: '/products', label: 'Products', end: false },
+  { to: '/inventory', label: 'Stock', end: false },
   { to: '/wallet', label: 'Wallet', end: false },
   { to: '/cart', label: 'Cart', end: false },
 ]
@@ -23,14 +24,14 @@ export default function Header() {
           Shopee <span className="text-sm font-medium opacity-80">India</span>
         </Link>
         <nav aria-label="Primary">
-          <ul className="flex gap-0.5 text-sm font-medium sm:gap-1">
+          <ul className="flex flex-wrap text-sm font-medium sm:gap-1">
             {NAV_ITEMS.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `rounded px-2 py-1.5 transition-colors sm:px-3 ${isActive ? 'bg-white/20' : 'hover:bg-white/10'}`
+                    `rounded px-1.5 py-1.5 transition-colors sm:px-3 ${isActive ? 'bg-white/20' : 'hover:bg-white/10'}`
                   }
                 >
                   {item.label}

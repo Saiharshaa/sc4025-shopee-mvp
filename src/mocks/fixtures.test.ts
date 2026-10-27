@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { calculateOrderTotal } from '../lib/pricing'
 import type { Cart } from '../types'
-import { getCart, getOrders, getProductById, getProducts, getVoucherByCode, getVouchers } from './index'
+import {
+  getCart,
+  getDarkStores,
+  getOrders,
+  getProductById,
+  getProducts,
+  getStockRecords,
+  getVendorById,
+  getVendors,
+  getVoucherByCode,
+  getVouchers,
+} from './index'
 
 // Guards for anyone adding fixtures: catches typos and inconsistent data early.
 
@@ -26,6 +37,44 @@ describe('voucher fixtures', () => {
   it('have unique codes', () => {
     const vouchers = getVouchers()
     expect(new Set(vouchers.map((v) => v.code)).size).toBe(vouchers.length)
+  })
+})
+
+describe('inventory fixtures', () => {
+  const stock = getStockRecords()
+  const storeIds = new Set(getDarkStores().map((s) => s.id))
+
+  it('have unique vendor and dark store ids', () => {
+    expect(new Set(getVendors().map((v) => v.id)).size).toBe(getVendors().length)
+    expect(storeIds.size).toBe(getDarkStores().length)
+  })
+
+  it('have at most one stock line per product per dark store', () => {
+    const keys = stock.map((s) => `${s.productId}@${s.darkStoreId}`)
+    expect(new Set(keys).size).toBe(keys.length)
+  })
+
+  it.each(stock)('$productId @ $darkStoreId is consistent', (s) => {
+    const product = getProductById(s.productId)
+    const vendor = getVendorById(s.vendorId)
+    expect(product).toBeDefined()
+    expect(vendor).toBeDefined()
+    expect(storeIds.has(s.darkStoreId)).toBe(true)
+    expect(Number.isInteger(s.units) && s.units >= 0).toBe(true)
+
+    // Global Picks promise: verified imports, sold by an importer the brand authorised, delivered same day.
+    expect(product!.seller).toBe(vendor!.name)
+    expect(product!.isImported && product!.isVerified).toBe(true)
+    expect(product!.speedTier).toBe('same-day')
+    expect(vendor!.authorisedBrands.some((brand) => product!.title.startsWith(`${brand} `))).toBe(true)
+  })
+
+  it('each product is held by exactly one vendor', () => {
+    const vendorsByProduct = new Map<string, Set<string>>()
+    for (const s of stock) {
+      vendorsByProduct.set(s.productId, (vendorsByProduct.get(s.productId) ?? new Set()).add(s.vendorId))
+    }
+    for (const vendors of vendorsByProduct.values()) expect(vendors.size).toBe(1)
   })
 })
 
