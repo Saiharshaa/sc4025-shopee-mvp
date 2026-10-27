@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useCart } from '../../context/useCart'
 import { formatRupees } from '../../lib/format'
-import { calculateCashback, calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
+import { bestVoucher, calculateCashback, calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
 import { getCoinBalance, getUser, getVouchers, placeOrder } from '../../mocks'
 import type { PaymentMethod } from '../../types'
 import PaymentMethodPicker from './PaymentMethodPicker'
@@ -13,15 +13,18 @@ import VoucherPicker from './VoucherPicker'
  * Route:  /checkout
  * OWNER:  Person 4 (Tech Lead)
  * Scope:  Checkout with voucher + coin stacking and the payment method
- *         (ShopeePay earns Coins back). All money maths lives in
+ *         (ShopeePay earns Coins back). The best voucher and Coins start
+ *         applied (the report's "auto-applied, all-in price"); both can be undone. All money maths lives in
  *         src/lib/pricing.ts; this page only collects choices and displays
  *         the breakdown.
  */
 export default function CheckoutPage() {
   const { cart, clearCart } = useCart()
   const navigate = useNavigate()
-  const [voucherCode, setVoucherCode] = useState<string | null>(null)
-  const [useCoins, setUseCoins] = useState(false)
+  const [voucherCode, setVoucherCode] = useState<string | null>(
+    () => bestVoucher(cart, getVouchers().filter((v) => !isVoucherExpired(v)))?.code ?? null,
+  )
+  const [useCoins, setUseCoins] = useState(true)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('shopeepay')
   const [error, setError] = useState<string | null>(null)
 
@@ -41,6 +44,7 @@ export default function CheckoutPage() {
   const coinBalance = getCoinBalance()
   const vouchers = getVouchers().filter((v) => !isVoucherExpired(v))
   const voucher = vouchers.find((v) => v.code === voucherCode) ?? null
+  const bestCode = bestVoucher(cart, vouchers)?.code ?? null
 
   // The engine caps coins; we only make sure we never ask for more than the user holds.
   const breakdown = calculateOrderTotal(cart, voucher, useCoins ? coinBalance : 0)
@@ -101,6 +105,7 @@ export default function CheckoutPage() {
             vouchers={vouchers}
             subtotal={breakdown.subtotal}
             selectedCode={voucherCode}
+            bestCode={bestCode}
             onSelect={setVoucherCode}
           />
 

@@ -127,7 +127,7 @@ export default function HomePage() {
         <h2 id="vouchers" className="text-lg font-bold">
           Your vouchers
         </h2>
-        <p className="text-sm text-gray-500">Pick one at checkout; only one applies per order.</p>
+        <p className="text-sm text-gray-500">The one that saves you the most is applied for you at checkout.</p>
         <ul className="mt-3 flex snap-x gap-3 overflow-x-auto pb-2">
           {vouchers.map((v) => (
             <li

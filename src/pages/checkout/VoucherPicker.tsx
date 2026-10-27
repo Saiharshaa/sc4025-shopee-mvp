@@ -8,15 +8,19 @@ interface Props {
   vouchers: Voucher[]
   subtotal: number
   selectedCode: string | null
+  /** The voucher that saves the most (bestVoucher in src/lib/pricing.ts). */
+  bestCode: string | null
   onSelect: (code: string | null) => void
 }
 
-export default function VoucherPicker({ vouchers, subtotal, selectedCode, onSelect }: Props) {
+export default function VoucherPicker({ vouchers, subtotal, selectedCode, bestCode, onSelect }: Props) {
   return (
     <fieldset className="rounded-lg bg-white p-4 shadow-sm">
       <legend className="sr-only">Voucher</legend>
       <h2 className="font-semibold">Shopee Voucher</h2>
-      <p className="text-xs text-gray-500">One voucher per order.</p>
+      <p className="text-xs text-gray-500">
+        One voucher per order.{bestCode && selectedCode === bestCode && ' We applied the one that saves you the most.'}
+      </p>
 
       <div className="mt-3 space-y-2">
         <label className="flex cursor-pointer items-center gap-3 rounded border border-gray-200 p-3 has-checked:border-brand">
@@ -48,7 +52,12 @@ export default function VoucherPicker({ vouchers, subtotal, selectedCode, onSele
                 onChange={() => onSelect(v.code)}
               />
               <span className="flex-1">
-                <span className="block text-sm font-medium">{v.title}</span>
+                <span className="block text-sm font-medium">
+                  {v.title}
+                  {v.code === bestCode && (
+                    <span className="ml-2 rounded bg-green-50 px-1.5 py-0.5 text-xs font-semibold text-green-800">Best deal</span>
+                  )}
+                </span>
                 <span className="block text-xs text-gray-500">
                   {v.code}
                   {v.minSpend ? ` · Min. spend ${formatRupees(v.minSpend)}` : ''} · Valid till{' '}

@@ -98,7 +98,7 @@ export default function WalletPage() {
         <h2 id="vouchers" className="text-lg font-bold">
           Vouchers <span className="text-sm font-normal text-gray-500">({available.length} available)</span>
         </h2>
-        <p className="text-sm text-gray-500">One voucher per order, chosen at checkout.</p>
+        <p className="text-sm text-gray-500">One per order. Checkout applies the one that saves you the most; you can change it.</p>
         <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {available.map((v) => (
             <VoucherTile key={v.code} voucher={v} daysLeft={Math.ceil((Date.parse(v.expiresAt) - now.getTime()) / DAY_MS)} />
