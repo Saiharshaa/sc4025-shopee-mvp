@@ -71,6 +71,7 @@ repo is private. So:
 | `/checkout`    | Checkout                 | `src/pages/checkout/`       | Person 4 (Tech Lead) |
 | `/wallet`      | Coins + vouchers         | `src/pages/wallet/`         | Person 5 (GTM)       |
 | `/orders/:id`  | Order tracking           | `src/pages/orders/`         | Person 5 (GTM)       |
+| `/inventory`   | Blinkit stock by vendor / dark store | `src/pages/inventory/` | Person 4 (Tech Lead) |
 
 ### Shared files
 
@@ -79,6 +80,7 @@ repo is private. So:
 | `src/types/index.ts`                  | Every shared type                      | Person 4 (Tech Lead) |
 | `src/mocks/`                          | Mock data + accessor functions         | Person 4 (Tech Lead) |
 | `src/lib/pricing.ts` (+ tests)        | Voucher / coin / shipping engine       | Person 4 (Tech Lead) |
+| `src/lib/inventory.ts` (+ tests)      | Low-stock and registration-renewal rules | Person 4 (Tech Lead) |
 | `src/lib/format.ts`                   | `formatRupees`, `formatDate`           | Person 4 (Tech Lead) |
 | `src/context/`                        | Cart state (`useCart`)                 | Person 4 (Tech Lead) |
 | `src/App.tsx`, `src/main.tsx`         | Route table, providers                 | Person 4 (Tech Lead) |
@@ -164,7 +166,7 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
 
    | Accessor                  | Returns                                               |
    | ------------------------- | ----------------------------------------------------- |
-   | `getProducts()`           | All 22 products (fresh array, safe to sort/filter)    |
+   | `getProducts()`           | All 27 products (fresh array, safe to sort/filter)    |
    | `getProductById(id)`      | One product, or `undefined`                           |
    | `getCategories()`         | `{ id, label }[]` for the 6 categories                |
    | `getVouchers()`           | All vouchers, including expired ones                  |
@@ -173,6 +175,10 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
    | `getUser()`               | Demo shopper with default address                     |
    | `getOrders()`             | Orders, newest first                                  |
    | `getOrderById(id)`        | One order, or `undefined`                             |
+   | `getVendors()` / `getVendorById(id)` | Brand-authorised importers (Global Picks)  |
+   | `getDarkStores()`         | Blinkit dark stores in the pilot city                 |
+   | `getStockRecords()`       | Every stock line: product × dark store, with units    |
+   | `getStockForProduct(id)`  | One product's stock per dark store (`[]` if not at Blinkit) |
    | `getCart()` / `placeOrder()` | Used by the cart/checkout. Read the live cart with `useCart()` instead |
 
    They are synchronous, so there are no loading states to handle.
@@ -228,10 +234,16 @@ export default function ExamplePage() {
 
 ## Mock data
 
-- **22 products** across 6 categories. They mix imported and local,
+- **27 products** across 6 categories. They mix imported and local,
   verified and unverified sellers, and all three speed tiers
   (`standard` / `express` / `same-day`). Products with `originalPrice` are
   on deal.
+- **Global Picks** (`p023`–`p027`): trending K-beauty imports pre-stocked in
+  Blinkit dark stores, so they're `same-day`. Each is held by one of
+  2 brand-authorised importers across 3 Bengaluru dark stores (the pilot
+  city). The stock deliberately includes low (≤ 5) and out-of-stock lines, and
+  Seoul Shelf India's import registration is due for renewal, so every status
+  shows on `/inventory`. Brands, importers and registration numbers are fictional.
 - **Vouchers:**
 
   | Code         | Type    | Value                | Min spend | Note             |
@@ -305,6 +317,7 @@ src/
   lib/
     pricing.ts            discount engine + tests (Person 4)
     format.ts             formatRupees, formatDate (Person 4)
+    inventory.ts          stock + registration status rules + tests (Person 4)
   context/                cart state + useCart() (Person 4)
   components/
     layout/               header, nav, page shell (Person 4)
@@ -314,6 +327,7 @@ src/
     products/             Person 2
     product-detail/       Person 3
     cart/ checkout/       Person 4
+    inventory/            Person 4
     wallet/ orders/       Person 5
 public/images/            placeholder product art
 ```
