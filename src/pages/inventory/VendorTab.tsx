@@ -38,8 +38,10 @@ export default function VendorTab({ vendors, stores, stock }: Props) {
 
             <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
               <Field label="CDSCO import registration (Form COS-2)">
-                <span className="mr-2 font-mono">{vendor.importRegistration.number}</span>
-                <RegistrationBadge validUntil={vendor.importRegistration.validUntil} />
+                <span className="block font-mono">{vendor.importRegistration.number}</span>
+                <span className="mt-1 inline-block">
+                  <RegistrationBadge validUntil={vendor.importRegistration.validUntil} />
+                </span>
               </Field>
               <Field label="Authorised brands">{vendor.authorisedBrands.join(', ')}</Field>
               <Field label="Importer-Exporter Code (IEC)">

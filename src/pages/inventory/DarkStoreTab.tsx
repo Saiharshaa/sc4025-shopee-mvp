@@ -32,7 +32,12 @@ export default function DarkStoreTab({ stores, stock }: Props) {
             </div>
             <p className="text-sm text-gray-500">
               {store.area}, {store.city} · {units} units across {lines.length} products
-              {needsRestock > 0 && <span className="text-amber-700"> · {needsRestock} need restocking</span>}
+              {needsRestock > 0 && (
+                <span className="text-amber-700">
+                  {' '}
+                  · {needsRestock} {needsRestock === 1 ? 'needs' : 'need'} restocking
+                </span>
+              )}
             </p>
 
             <div className="mt-3 overflow-x-auto">
