@@ -3,6 +3,7 @@ import type { Cart, FixedVoucher, PercentageVoucher, Product, SpeedTier } from '
 import {
   DEFAULT_PRICING_RULES,
   applyCoins,
+  bestVoucher,
   calculateCashback,
   calculateCoinCap,
   calculateOrderTotal,
@@ -244,6 +245,28 @@ describe('zero floor', () => {
         }
       }
     }
+  })
+})
+
+// --- best voucher ----------------------------------------------------------
+
+describe('bestVoucher', () => {
+  it('picks the eligible voucher that saves the most', () => {
+    // seeded cart 1916: SAVE15 -> 150 (capped), FLAT50 -> 50, MEGA25 needs 1999
+    const best = bestVoucher(cartOf([1299, 1], [199, 2], [219, 1]), [fixed(50), pct(15, 150, 999), pct(25, 300, 1999)])
+    expect(best?.code).toBe('PCT15')
+  })
+
+  it('accounts for shipping: a voucher that loses free shipping can be worse than none', () => {
+    // 520 ships free; a 30 voucher drops it to 490 and adds 40 shipping -> 530 > 520
+    expect(bestVoucher(cartOf([520, 1]), [fixed(30)])).toBeNull()
+    // a 100 voucher: 420 + 40 = 460 < 520, so it still wins
+    expect(bestVoucher(cartOf([520, 1]), [fixed(30), fixed(100)])?.code).toBe('FLAT100')
+  })
+
+  it('is null when nothing is eligible, and keeps the earlier voucher on a tie', () => {
+    expect(bestVoucher(cartOf([100, 1]), [pct(15, 150, 999)])).toBeNull()
+    expect(bestVoucher(cartOf([1000, 1]), [{ ...fixed(100), code: 'A' }, { ...fixed(100), code: 'B' }])?.code).toBe('A')
   })
 })
 

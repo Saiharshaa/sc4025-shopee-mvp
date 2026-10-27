@@ -52,7 +52,11 @@ repo is private. So:
 
 > Fill in names and GitHub handles in the first table.
 
-| Person   | Role                | Name / GitHub   | Owns                                    |
+Pages were first assigned one per role (last column). Every page has since
+been built by Person 4; the commit history shows who wrote each one. The
+ownership rules below still apply if a teammate takes a page on.
+
+| Person   | Role                | Name / GitHub   | Page originally assigned                |
 | -------- | ------------------- | --------------- | --------------------------------------- |
 | Person 1 | PM                  | _add_           | Home + deals feed                       |
 | Person 2 | Analyst             | _add_           | Listing, search, filters                |
@@ -62,15 +66,16 @@ repo is private. So:
 
 ### Routes
 
-| Route          | Page                     | Folder                      | Owner                |
+| Route          | Page                     | Folder                      | Built by             |
 | -------------- | ------------------------ | --------------------------- | -------------------- |
-| `/`            | Home + deals feed        | `src/pages/home/`           | Person 1 (PM)        |
-| `/products`    | Listing, search, filters | `src/pages/products/`       | Person 2 (Analyst)   |
-| `/product/:id` | Product detail           | `src/pages/product-detail/` | Person 3 (Designer)  |
+| `/`            | Home: Global Picks hero, trending shelf, deals | `src/pages/home/` | Person 4 (Tech Lead) |
+| `/products`    | Listing, search, filters | `src/pages/products/`       | Person 4 (Tech Lead) |
+| `/product/:id` | Product detail, trust panel, add to cart | `src/pages/product-detail/` | Person 4 (Tech Lead) |
 | `/cart`        | Cart                     | `src/pages/cart/`           | Person 4 (Tech Lead) |
-| `/checkout`    | Checkout                 | `src/pages/checkout/`       | Person 4 (Tech Lead) |
-| `/wallet`      | Coins + vouchers         | `src/pages/wallet/`         | Person 5 (GTM)       |
-| `/orders/:id`  | Order tracking           | `src/pages/orders/`         | Person 5 (GTM)       |
+| `/checkout`    | Checkout, ShopeePay      | `src/pages/checkout/`       | Person 4 (Tech Lead) |
+| `/wallet`      | Coins + vouchers         | `src/pages/wallet/`         | Person 4 (Tech Lead) |
+| `/orders`      | All orders               | `src/pages/orders/`         | Person 4 (Tech Lead) |
+| `/orders/:id`  | Live order tracking      | `src/pages/orders/`         | Person 4 (Tech Lead) |
 | `/inventory`   | Blinkit stock by vendor / dark store | `src/pages/inventory/` | Person 4 (Tech Lead) |
 
 ### Shared files
@@ -81,11 +86,14 @@ repo is private. So:
 | `src/mocks/`                          | Mock data + accessor functions         | Person 4 (Tech Lead) |
 | `src/lib/pricing.ts` (+ tests)        | Voucher / coin / shipping engine       | Person 4 (Tech Lead) |
 | `src/lib/inventory.ts` (+ tests)      | Low-stock and registration-renewal rules | Person 4 (Tech Lead) |
-| `src/lib/format.ts`                   | `formatRupees`, `formatDate`           | Person 4 (Tech Lead) |
+| `src/lib/catalogue.ts` (+ tests)      | Search, filters, sorting, deal %, delivery labels | Person 4 (Tech Lead) |
+| `src/lib/tracking.ts` (+ tests)       | Shipments + live Blinkit delivery progress | Person 4 (Tech Lead) |
+| `src/lib/format.ts`                   | `formatRupees`, `formatDate`, `formatDateTime` | Person 4 (Tech Lead) |
 | `src/context/`                        | Cart state (`useCart`)                 | Person 4 (Tech Lead) |
 | `src/App.tsx`, `src/main.tsx`         | Route table, providers                 | Person 4 (Tech Lead) |
 | `src/components/layout/`              | Header, nav, page shell                | Person 4 (Person 3 may restyle) |
-| `src/components/ui/`, `@theme` in `src/index.css` | Design system + colour tokens | Person 3 (Designer)  |
+| `src/components/ui/`                  | Shared UI (`ProductCard`)              | Person 4 (Person 3 may restyle) |
+| `@theme` in `src/index.css`           | Colour tokens                          | Person 3 (Designer)  |
 
 **Rule: only edit files you own.** If you need something changed in a shared
 file (a new field on `Product`, a new route, a new accessor), message
@@ -155,11 +163,11 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
 
 ---
 
-## Where to add your page
+## Working on a page
 
-1. **Your file already exists and is routed.** Open your page in
-   `src/pages/<your-folder>/` and replace the placeholder. Put page-specific
-   components next to it in the same folder.
+1. **Every route is built.** To change a page, edit its folder in
+   `src/pages/<folder>/` on your own branch. Put page-specific components
+   next to it in the same folder.
 
 2. **Get data from `src/mocks` only.** Never import from `src/mocks/data/*`.
    These accessors are the swap point if the data source ever changes:
@@ -179,6 +187,8 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
    | `getDarkStores()`         | Blinkit dark stores in the pilot city                 |
    | `getStockRecords()`       | Every stock line: product × dark store, with units    |
    | `getStockForProduct(id)`  | One product's stock per dark store (`[]` if not at Blinkit) |
+   | `getDarkStoreForPincode(pin)` | The dark store delivering to a pincode, or `undefined` |
+   | `getBlinkitAvailability(id)` | `{ store, units }` at the demo shopper's nearest store, or `undefined` if not stocked there |
    | `getCart()` / `placeOrder()` | Used by the cart/checkout. Read the live cart with `useCart()` instead |
 
    They are synchronous, so there are no loading states to handle.
@@ -194,11 +204,12 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
    `src/lib/format.ts`.
 
 6. **Discount maths:** use `src/lib/pricing.ts` (`calculateOrderTotal`,
-   `evaluateVoucher`, `isVoucherExpired`). Don't re-implement it in a page.
+   `evaluateVoucher`, `bestVoucher`, `calculateCashback`, `isVoucherExpired`).
+   Search and sorting: `src/lib/catalogue.ts`. Don't re-implement either in a page.
 
-7. **UI components:** Person 3's design system will live in
-   `src/components/ui/`. Until then, use Tailwind classes directly. Brand
-   colours: `bg-brand`, `text-brand`, `bg-brand-light`, `hover:bg-brand-dark`.
+7. **UI components:** shared pieces live in `src/components/ui/`
+   (`ProductCard` so far; see its README). Brand colours: `bg-brand`,
+   `text-brand`, `bg-brand-light`, `hover:bg-brand-dark`.
 
 8. **Links:** use `<Link to="/product/p001">` from `react-router`, never
    `<a href>`. A plain anchor does a full page reload, which wipes the cart
@@ -259,14 +270,18 @@ export default function ExamplePage() {
   imported, COD), `ORD-1003` (out for delivery, ShopeePay, +17 Coins).
   **Cart:** pre-filled with 3 lines (₹1,916) so checkout can be demoed
   straight away.
-- Placing an order deducts the coins used, credits any ShopeePay cashback and
-  adds an order **in memory only**. A full page reload resets everything,
-  which is handy between usability-test participants. Each order's
-  `pricing.paymentMethod` and `pricing.coinsEarned` are there for order
-  tracking and the wallet.
+- **Dark stores** list the pincodes they serve. The demo shopper (HSR Layout,
+  560102) is served by Blinkit HSR Layout, so Global Picks show "⚡ 11 min".
+- Placing an order deducts the coins used, credits any ShopeePay cashback,
+  sends Global Picks from the nearest dark store (`OrderItem.darkStoreId`) and
+  takes them out of its stock, all **in memory only**. A full page reload
+  resets everything, which is handy between usability-test participants.
+  Each order's `pricing.paymentMethod` and `pricing.coinsEarned` are there for
+  order tracking and the wallet.
 - `src/mocks/fixtures.test.ts` checks fixture sanity (unique ids, valid
-  ratings, order totals that match the pricing engine). Run `npm test` after
-  editing mock data.
+  ratings, order totals that match the pricing engine) and
+  `src/mocks/placeOrder.test.ts` checks fulfilment and stock. Run `npm test`
+  after editing mock data.
 
 ---
 
@@ -300,6 +315,11 @@ The team agreed these rules on 2026-10-14:
    balance as soon as the order is placed; a live system would credit them
    after delivery.
 
+**Checkout defaults:** checkout opens with `bestVoucher(cart, vouchers)`
+selected (the voucher giving the lowest total before coins, shipping
+included) and "Use Shopee Coins" ticked, as in the Ch.1 journey ("vouchers and
+Coins auto-applied"). The shopper can change or untick both.
+
 The thresholds live in `DEFAULT_PRICING_RULES`. Worked example (the seeded
 cart with `SAVE15`, coins on, paid with ShopeePay):
 
@@ -326,21 +346,24 @@ src/
   mocks/
     index.ts              accessor functions: import from here (Person 4)
     data/                 raw fixtures (don't import directly)
-  lib/
-    pricing.ts            discount engine + tests (Person 4)
-    format.ts             formatRupees, formatDate (Person 4)
-    inventory.ts          stock + registration status rules + tests (Person 4)
+  lib/                    pure functions, each with tests (Person 4)
+    pricing.ts            discount engine, best voucher, ShopeePay cashback
+    catalogue.ts          search, filters, sorting, deal %, delivery labels
+    inventory.ts          stock + registration status rules
+    tracking.ts           shipments + live Blinkit delivery progress
+    format.ts             formatRupees, formatDate, formatDateTime
   context/                cart state + useCart() (Person 4)
   components/
     layout/               header, nav, page shell (Person 4)
-    ui/                   design system (Person 3)
-  pages/
-    home/                 Person 1
-    products/             Person 2
-    product-detail/       Person 3
-    cart/ checkout/       Person 4
-    inventory/            Person 4
-    wallet/ orders/       Person 5
+    ui/                   shared UI: ProductCard (Person 4)
+  pages/                  all built by Person 4
+    home/                 Global Picks hero, trending shelf, deals
+    products/             listing, search, filters
+    product-detail/       trust panel, Blinkit delivery, add to cart
+    cart/ checkout/       cart, checkout, ShopeePay
+    orders/               orders list + live tracking
+    wallet/               Coins + vouchers
+    inventory/            Blinkit stock by vendor / dark store
 public/images/            placeholder product art
 ```
 

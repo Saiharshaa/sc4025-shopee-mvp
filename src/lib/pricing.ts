@@ -173,6 +173,25 @@ export function calculateOrderTotal(
   }
 }
 
+/**
+ * The voucher that makes this cart cheapest, comparing totals BEFORE coins so
+ * spending coins never decides it. Accounts for shipping: a voucher that drops
+ * the cart below the free-shipping threshold can lose. Ties keep the earlier
+ * voucher. null when no voucher beats using none. Pass unexpired vouchers.
+ */
+export function bestVoucher(cart: Cart, vouchers: Voucher[], rules: PricingRules = DEFAULT_PRICING_RULES): Voucher | null {
+  let best: Voucher | null = null
+  let bestTotal = calculateOrderTotal(cart, null, 0, rules).total
+  for (const voucher of vouchers) {
+    const { total, voucher: result } = calculateOrderTotal(cart, voucher, 0, rules)
+    if (result?.eligible && total < bestTotal) {
+      best = voucher
+      bestTotal = total
+    }
+  }
+  return best
+}
+
 /** Rule 9. Pass the breakdown's `total`: cashback is on what is actually paid. */
 export function calculateCashback(
   total: number,
