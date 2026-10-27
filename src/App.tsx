@@ -3,6 +3,7 @@ import Layout from './components/layout/Layout'
 import CartPage from './pages/cart/CartPage'
 import CheckoutPage from './pages/checkout/CheckoutPage'
 import HomePage from './pages/home/HomePage'
+import InventoryPage from './pages/inventory/InventoryPage'
 import NotFoundPage from './pages/NotFoundPage'
 import OrderTrackingPage from './pages/orders/OrderTrackingPage'
 import ProductDetailPage from './pages/product-detail/ProductDetailPage'
@@ -32,6 +33,8 @@ export default function App() {
         <Route path="wallet" element={<WalletPage />} />
         {/* Person 5 (GTM) */}
         <Route path="orders/:id" element={<OrderTrackingPage />} />
+        {/* Person 4 (Tech Lead) */}
+        <Route path="inventory" element={<InventoryPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
