@@ -20,16 +20,23 @@
  *     min(balance, coinsWanted).
  *  7. Order of operations: subtotal -> voucher -> shipping -> coins.
  *  8. Payable total = post-voucher subtotal + shipping - coins, never < 0.
+ *  9. Cashback (proposed 2026-10-27 after the 22 Oct meeting): paying with
+ *     ShopeePay earns floor(shopeePayCashbackPercent% of the payable total)
+ *     Coins, at most maxCashbackCoins per order. Other methods earn none.
+ *     It is based on what the shopper actually pays, so coins spent never
+ *     earn coins, and it never changes the total. See calculateCashback.
  *
  * Percentages are whole numbers (15, not 0.15) so every calculation stays in
  * integer arithmetic before the final floor. 0.1 * x style maths can land on
  * 6.9999... and floor to the wrong rupee.
  */
 import type {
+  CashbackBreakdown,
   Cart,
   CoinsBreakdown,
   LineItemBreakdown,
   OrderBreakdown,
+  PaymentMethod,
   PricingRules,
   ShippingBreakdown,
   Voucher,
@@ -40,6 +47,8 @@ export const DEFAULT_PRICING_RULES: PricingRules = {
   freeShippingThreshold: 499,
   shippingFee: 40,
   coinCapPercent: 10,
+  shopeePayCashbackPercent: 5,
+  maxCashbackCoins: 100,
 }
 
 export function calculateLineItems(cart: Cart): LineItemBreakdown[] {
@@ -162,6 +171,18 @@ export function calculateOrderTotal(
     coins,
     total,
   }
+}
+
+/** Rule 9. Pass the breakdown's `total`: cashback is on what is actually paid. */
+export function calculateCashback(
+  total: number,
+  method: PaymentMethod,
+  rules: PricingRules = DEFAULT_PRICING_RULES,
+): CashbackBreakdown {
+  const percent = method === 'shopeepay' ? rules.shopeePayCashbackPercent : 0
+  const rawCoins = Math.floor((Math.max(0, total) * percent) / 100)
+  const coinsEarned = Math.min(rawCoins, rules.maxCashbackCoins)
+  return { method, percent, coinsEarned, capped: coinsEarned < rawCoins }
 }
 
 /** True once the voucher's expiry time has passed. Pass `now` explicitly in tests. */

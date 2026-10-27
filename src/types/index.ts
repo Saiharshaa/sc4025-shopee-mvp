@@ -98,6 +98,10 @@ export interface PricingRules {
   shippingFee: number
   /** Coins can cover at most this % of the post-voucher subtotal. */
   coinCapPercent: number
+  /** Paying with ShopeePay earns this % of the payable total back as Coins. */
+  shopeePayCashbackPercent: number
+  /** Most cashback Coins a single order can earn. */
+  maxCashbackCoins: number
 }
 
 export interface LineItemBreakdown {
@@ -158,6 +162,20 @@ export interface OrderBreakdown {
   coins: CoinsBreakdown
   /** Payable total. Never below zero. */
   total: number
+}
+
+/** ShopeePay runs on UPI. Only ShopeePay earns Coins cashback. */
+export type PaymentMethod = 'shopeepay' | 'upi' | 'cod'
+
+/** Output of calculateCashback in src/lib/pricing.ts. */
+export interface CashbackBreakdown {
+  method: PaymentMethod
+  /** Cashback rate for this method; 0 if it earns none. */
+  percent: number
+  /** Coins credited for this order (1 coin = Rs 1). */
+  coinsEarned: number
+  /** True when the per-order maximum reduced the cashback. */
+  capped: boolean
 }
 
 // ---------------------------------------------------------------------------
