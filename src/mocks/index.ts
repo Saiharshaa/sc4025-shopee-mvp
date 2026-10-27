@@ -39,6 +39,7 @@ import { VOUCHERS } from './data/vouchers'
 // In-memory session state (mutated only by placeOrder).
 let coinBalance = INITIAL_COIN_BALANCE
 const orders: Order[] = [...ORDERS]
+const stock: StockRecord[] = STOCK.map((s) => ({ ...s }))
 
 // ---------------------------------------------------------------------------
 // Products
@@ -73,14 +74,14 @@ export function getDarkStores(): DarkStore[] {
   return [...DARK_STORES]
 }
 
-/** Every stock line: one per (product, dark store). */
+/** Every stock line: one per (product, dark store). Copies, so pages can't change live stock. */
 export function getStockRecords(): StockRecord[] {
-  return [...STOCK]
+  return stock.map((s) => ({ ...s }))
 }
 
 /** Where a product is stocked, one record per dark store. Empty if it isn't at Blinkit. */
 export function getStockForProduct(productId: string): StockRecord[] {
-  return STOCK.filter((s) => s.productId === productId)
+  return stock.filter((s) => s.productId === productId).map((s) => ({ ...s }))
 }
 
 /** The dark store that delivers to this pincode, if any. */
@@ -95,7 +96,7 @@ export function getDarkStoreForPincode(pincode: string): DarkStore | undefined {
  */
 export function getBlinkitAvailability(productId: string): BlinkitAvailability | undefined {
   const store = getDarkStoreForPincode(USER.defaultAddress.pincode)
-  const record = store && STOCK.find((s) => s.productId === productId && s.darkStoreId === store.id)
+  const record = store && stock.find((s) => s.productId === productId && s.darkStoreId === store.id)
   return store && record ? { store, units: record.units } : undefined
 }
 
@@ -154,7 +155,8 @@ export function getOrderById(id: string): Order | undefined {
 
 /**
  * Record a new order from checkout, deduct the coins it used and credit any
- * ShopeePay cashback (rule 9 in src/lib/pricing.ts).
+ * ShopeePay cashback (rule 9 in src/lib/pricing.ts). Global Picks are sent
+ * from the Blinkit store serving the delivery pincode, and its stock goes down.
  * `breakdown` must be the result of calculateOrderTotal() for this cart.
  *
  * Cashback is credited straight away so a demo can show it in the wallet; a
@@ -169,6 +171,16 @@ export function placeOrder(
   if (cart.items.length === 0) throw new Error('Cannot place an order with an empty cart')
   if (breakdown.coins.applied > coinBalance) throw new Error('Not enough coins for this order')
 
+  // Check every Global Pick is in stock nearby before changing anything.
+  const store = getDarkStoreForPincode(shippingAddress.pincode)
+  const stockLines = cart.items.map(({ product, quantity }) => {
+    const line = store && stock.find((s) => s.productId === product.id && s.darkStoreId === store.id)
+    if (line && line.units < quantity) {
+      throw new Error(`Only ${line.units} of ${product.title} left at ${store.name}`)
+    }
+    return line
+  })
+
   const cashback = calculateCashback(breakdown.total, paymentMethod)
   const now = new Date()
   const slowestEtaDays = Math.max(...cart.items.map((i) => i.product.etaDays))
@@ -179,13 +191,14 @@ export function placeOrder(
     id: `ORD-${1000 + orders.length + 1}`,
     placedAt: now.toISOString(),
     status: 'placed',
-    items: cart.items.map(({ product, quantity }) => ({
+    items: cart.items.map(({ product, quantity }, i) => ({
       productId: product.id,
       title: product.title,
       imageUrl: product.imageUrl,
       unitPrice: product.price,
       quantity,
       speedTier: product.speedTier,
+      ...(stockLines[i] && { darkStoreId: stockLines[i].darkStoreId }),
     })),
     pricing: {
       subtotal: breakdown.subtotal,
@@ -202,6 +215,10 @@ export function placeOrder(
     timeline: [{ status: 'placed', at: now.toISOString() }],
   }
 
+  cart.items.forEach(({ quantity }, i) => {
+    const line = stockLines[i]
+    if (line) line.units -= quantity
+  })
   coinBalance += cashback.coinsEarned - breakdown.coins.applied
   orders.push(order)
   return order
