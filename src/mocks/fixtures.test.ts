@@ -3,11 +3,14 @@ import { calculateCashback, calculateOrderTotal } from '../lib/pricing'
 import type { Cart } from '../types'
 import {
   getCart,
+  getBlinkitAvailability,
+  getDarkStoreForPincode,
   getDarkStores,
   getOrders,
   getProductById,
   getProducts,
   getStockRecords,
+  getUser,
   getVendorById,
   getVendors,
   getVoucherByCode,
@@ -67,6 +70,19 @@ describe('inventory fixtures', () => {
     expect(product!.isImported && product!.isVerified).toBe(true)
     expect(product!.speedTier).toBe('same-day')
     expect(vendor!.authorisedBrands.some((brand) => product!.title.startsWith(`${brand} `))).toBe(true)
+  })
+
+  it('no pincode is served by two dark stores', () => {
+    const pincodes = getDarkStores().flatMap((s) => s.pincodes)
+    expect(new Set(pincodes).size).toBe(pincodes.length)
+  })
+
+  it('the demo shopper is served by a dark store that stocks Global Picks', () => {
+    const store = getDarkStoreForPincode(getUser().defaultAddress.pincode)
+    expect(store).toBeDefined()
+    expect(stock.some((s) => s.darkStoreId === store!.id && s.units > 0)).toBe(true)
+    expect(getBlinkitAvailability('p023')).toMatchObject({ store: { id: store!.id } })
+    expect(getBlinkitAvailability('p001')).toBeUndefined()
   })
 
   it('each product is held by exactly one vendor', () => {

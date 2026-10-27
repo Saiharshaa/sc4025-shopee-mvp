@@ -15,6 +15,7 @@
  */
 import type {
   Address,
+  BlinkitAvailability,
   Cart,
   Category,
   DarkStore,
@@ -80,6 +81,22 @@ export function getStockRecords(): StockRecord[] {
 /** Where a product is stocked, one record per dark store. Empty if it isn't at Blinkit. */
 export function getStockForProduct(productId: string): StockRecord[] {
   return STOCK.filter((s) => s.productId === productId)
+}
+
+/** The dark store that delivers to this pincode, if any. */
+export function getDarkStoreForPincode(pincode: string): DarkStore | undefined {
+  return DARK_STORES.find((s) => s.pincodes.includes(pincode))
+}
+
+/**
+ * A product's stock at the dark store serving the demo shopper's default
+ * address. undefined if the product isn't stocked there (i.e. not a Global
+ * Pick for this shopper); `units` is 0 when it's out of stock nearby.
+ */
+export function getBlinkitAvailability(productId: string): BlinkitAvailability | undefined {
+  const store = getDarkStoreForPincode(USER.defaultAddress.pincode)
+  const record = store && STOCK.find((s) => s.productId === productId && s.darkStoreId === store.id)
+  return store && record ? { store, units: record.units } : undefined
 }
 
 // ---------------------------------------------------------------------------

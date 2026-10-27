@@ -43,6 +43,19 @@ export interface Product {
   category: Category
 }
 
+/** Listing filters (see filterProducts in src/lib/catalogue.ts). */
+export interface ProductFilters {
+  /** Free text; every word must match the title, description, seller or category. */
+  query: string
+  category: Category | null
+  /** Keep only these ids (e.g. products in stock at Blinkit). null = no restriction. */
+  onlyIds: ReadonlySet<string> | null
+  verifiedOnly: boolean
+  dealsOnly: boolean
+}
+
+export type ProductSort = 'relevance' | 'price-asc' | 'price-desc' | 'rating' | 'discount'
+
 // ---------------------------------------------------------------------------
 // Vouchers & coins
 // ---------------------------------------------------------------------------
@@ -290,6 +303,14 @@ export interface DarkStore {
   city: string
   /** Typical door-to-door time for shoppers this store serves. */
   avgDeliveryMinutes: number
+  /** Delivery pincodes this store serves. */
+  pincodes: string[]
+}
+
+/** A product's stock at the dark store serving the shopper. `units` may be 0. */
+export interface BlinkitAvailability {
+  store: DarkStore
+  units: number
 }
 
 /** Units of one product that one vendor keeps in one dark store. */
