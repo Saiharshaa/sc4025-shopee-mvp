@@ -33,9 +33,9 @@ export const VENDORS: Vendor[] = [
 ]
 
 export const DARK_STORES: DarkStore[] = [
-  { id: 'ds-hsr', name: 'Blinkit HSR Layout', area: 'HSR Layout Sector 2', city: 'Bengaluru', avgDeliveryMinutes: 11 },
-  { id: 'ds-kor', name: 'Blinkit Koramangala', area: 'Koramangala 5th Block', city: 'Bengaluru', avgDeliveryMinutes: 14 },
-  { id: 'ds-ind', name: 'Blinkit Indiranagar', area: '100 Feet Road, Indiranagar', city: 'Bengaluru', avgDeliveryMinutes: 17 },
+  { id: 'ds-hsr', name: 'Blinkit HSR Layout', area: 'HSR Layout', city: 'Bengaluru', avgDeliveryMinutes: 11 },
+  { id: 'ds-kor', name: 'Blinkit Koramangala', area: 'Koramangala', city: 'Bengaluru', avgDeliveryMinutes: 14 },
+  { id: 'ds-ind', name: 'Blinkit Indiranagar', area: 'Indiranagar', city: 'Bengaluru', avgDeliveryMinutes: 17 },
 ]
 
 // Mix of healthy, low (<= 5) and out-of-stock lines so every status shows up.

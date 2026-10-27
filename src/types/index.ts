@@ -264,6 +264,7 @@ export interface Vendor {
 export interface DarkStore {
   id: string
   name: string
+  /** Short locality name, used as a column header. */
   area: string
   city: string
   /** Typical door-to-door time for shoppers this store serves. */
