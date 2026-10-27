@@ -234,6 +234,9 @@ export interface OrderPricing {
   shippingFee: number
   coinsUsed: number
   total: number
+  paymentMethod: PaymentMethod
+  /** ShopeePay cashback credited for this order. 0 for other methods. */
+  coinsEarned: number
 }
 
 export interface Order {

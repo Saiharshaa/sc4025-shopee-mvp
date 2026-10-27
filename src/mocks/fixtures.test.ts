@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateOrderTotal } from '../lib/pricing'
+import { calculateCashback, calculateOrderTotal } from '../lib/pricing'
 import type { Cart } from '../types'
 import {
   getCart,
@@ -102,12 +102,14 @@ describe('order fixtures', () => {
       shippingFee: b.shipping.fee,
       coinsUsed: b.coins.applied,
       total: b.total,
+      coinsEarned: calculateCashback(b.total, order.pricing.paymentMethod).coinsEarned,
     }).toEqual({
       subtotal: order.pricing.subtotal,
       voucherDiscount: order.pricing.voucherDiscount,
       shippingFee: order.pricing.shippingFee,
       coinsUsed: order.pricing.coinsUsed,
       total: order.pricing.total,
+      coinsEarned: order.pricing.coinsEarned,
     })
   })
 

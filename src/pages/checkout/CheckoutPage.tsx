@@ -44,7 +44,7 @@ export default function CheckoutPage() {
 
   function handlePlaceOrder() {
     try {
-      const order = placeOrder(cart, breakdown, address)
+      const order = placeOrder(cart, breakdown, address, 'upi')
       clearCart()
       navigate(`/orders/${order.id}`)
     } catch (e) {
