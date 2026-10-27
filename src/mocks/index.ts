@@ -13,8 +13,21 @@
  * a full page reload, which conveniently gives every usability-test session a
  * clean slate.
  */
-import type { Address, Cart, Category, Order, OrderBreakdown, Product, User, Voucher } from '../types'
+import type {
+  Address,
+  Cart,
+  Category,
+  DarkStore,
+  Order,
+  OrderBreakdown,
+  Product,
+  StockRecord,
+  User,
+  Vendor,
+  Voucher,
+} from '../types'
 import { INITIAL_CART } from './data/cart'
+import { DARK_STORES, STOCK, VENDORS } from './data/inventory'
 import { ORDERS } from './data/orders'
 import { CATEGORY_LABELS, PRODUCTS } from './data/products'
 import { INITIAL_COIN_BALANCE, USER } from './data/user'
@@ -38,6 +51,33 @@ export function getProductById(id: string): Product | undefined {
 
 export function getCategories(): { id: Category; label: string }[] {
   return (Object.keys(CATEGORY_LABELS) as Category[]).map((id) => ({ id, label: CATEGORY_LABELS[id] }))
+}
+
+// ---------------------------------------------------------------------------
+// Blinkit inventory (Global Picks)
+// ---------------------------------------------------------------------------
+
+/** Brand-authorised importers that keep stock in Blinkit dark stores. */
+export function getVendors(): Vendor[] {
+  return [...VENDORS]
+}
+
+export function getVendorById(id: string): Vendor | undefined {
+  return VENDORS.find((v) => v.id === id)
+}
+
+export function getDarkStores(): DarkStore[] {
+  return [...DARK_STORES]
+}
+
+/** Every stock line: one per (product, dark store). */
+export function getStockRecords(): StockRecord[] {
+  return [...STOCK]
+}
+
+/** Where a product is stocked, one record per dark store. Empty if it isn't at Blinkit. */
+export function getStockForProduct(productId: string): StockRecord[] {
+  return STOCK.filter((s) => s.productId === productId)
 }
 
 // ---------------------------------------------------------------------------
