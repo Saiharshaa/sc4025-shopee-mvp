@@ -36,6 +36,8 @@ export const ORDERS: Order[] = [
       shippingFee: 0,
       coinsUsed: 100,
       total: 1537,
+      paymentMethod: 'upi',
+      coinsEarned: 0,
     },
     shippingAddress: USER.defaultAddress,
     estimatedDelivery: '2026-09-24',
@@ -77,6 +79,8 @@ export const ORDERS: Order[] = [
       shippingFee: 0,
       coinsUsed: 0,
       total: 898,
+      paymentMethod: 'cod',
+      coinsEarned: 0,
     },
     shippingAddress: USER.defaultAddress,
     estimatedDelivery: '2026-10-22',
@@ -109,6 +113,7 @@ export const ORDERS: Order[] = [
       },
     ],
     // 328, no voucher, below threshold -> Rs 40 shipping -> 20 coins (cap 32)
+    // Paid with ShopeePay: 5% of 348 = 17.4 -> 17 Coins back
     pricing: {
       subtotal: 328,
       voucherCode: null,
@@ -116,6 +121,8 @@ export const ORDERS: Order[] = [
       shippingFee: 40,
       coinsUsed: 20,
       total: 348,
+      paymentMethod: 'shopeepay',
+      coinsEarned: 17,
     },
     shippingAddress: USER.defaultAddress,
     estimatedDelivery: '2026-10-14',

@@ -20,12 +20,14 @@ import type {
   DarkStore,
   Order,
   OrderBreakdown,
+  PaymentMethod,
   Product,
   StockRecord,
   User,
   Vendor,
   Voucher,
 } from '../types'
+import { calculateCashback } from '../lib/pricing'
 import { INITIAL_CART } from './data/cart'
 import { DARK_STORES, STOCK, VENDORS } from './data/inventory'
 import { ORDERS } from './data/orders'
@@ -134,13 +136,23 @@ export function getOrderById(id: string): Order | undefined {
 }
 
 /**
- * Record a new order from checkout and deduct the coins it used.
+ * Record a new order from checkout, deduct the coins it used and credit any
+ * ShopeePay cashback (rule 9 in src/lib/pricing.ts).
  * `breakdown` must be the result of calculateOrderTotal() for this cart.
+ *
+ * Cashback is credited straight away so a demo can show it in the wallet; a
+ * live system would credit it once the order is delivered.
  */
-export function placeOrder(cart: Cart, breakdown: OrderBreakdown, shippingAddress: Address): Order {
+export function placeOrder(
+  cart: Cart,
+  breakdown: OrderBreakdown,
+  shippingAddress: Address,
+  paymentMethod: PaymentMethod,
+): Order {
   if (cart.items.length === 0) throw new Error('Cannot place an order with an empty cart')
   if (breakdown.coins.applied > coinBalance) throw new Error('Not enough coins for this order')
 
+  const cashback = calculateCashback(breakdown.total, paymentMethod)
   const now = new Date()
   const slowestEtaDays = Math.max(...cart.items.map((i) => i.product.etaDays))
   const eta = new Date(now)
@@ -165,13 +177,15 @@ export function placeOrder(cart: Cart, breakdown: OrderBreakdown, shippingAddres
       shippingFee: breakdown.shipping.fee,
       coinsUsed: breakdown.coins.applied,
       total: breakdown.total,
+      paymentMethod,
+      coinsEarned: cashback.coinsEarned,
     },
     shippingAddress,
     estimatedDelivery: toLocalIsoDate(eta),
     timeline: [{ status: 'placed', at: now.toISOString() }],
   }
 
-  coinBalance -= breakdown.coins.applied
+  coinBalance += cashback.coinsEarned - breakdown.coins.applied
   orders.push(order)
   return order
 }

@@ -3,6 +3,7 @@ import type { Cart, FixedVoucher, PercentageVoucher, Product, SpeedTier } from '
 import {
   DEFAULT_PRICING_RULES,
   applyCoins,
+  calculateCashback,
   calculateCoinCap,
   calculateOrderTotal,
   evaluateVoucher,
@@ -243,6 +244,44 @@ describe('zero floor', () => {
         }
       }
     }
+  })
+})
+
+// --- ShopeePay cashback ----------------------------------------------------
+
+describe('calculateCashback', () => {
+  it('ShopeePay earns 5% of the payable total in Coins, rounded DOWN', () => {
+    // 5% of 1590 = 79.5 -> 79
+    expect(calculateCashback(1590, 'shopeepay')).toEqual({ method: 'shopeepay', percent: 5, coinsEarned: 79, capped: false })
+  })
+
+  it('is capped at the per-order maximum', () => {
+    // 5% of 5000 = 250 -> 100
+    expect(calculateCashback(5000, 'shopeepay')).toMatchObject({ coinsEarned: 100, capped: true })
+    expect(calculateCashback(2000, 'shopeepay')).toMatchObject({ coinsEarned: 100, capped: false })
+  })
+
+  it('other UPI apps and cash on delivery earn nothing', () => {
+    expect(calculateCashback(1590, 'upi')).toEqual({ method: 'upi', percent: 0, coinsEarned: 0, capped: false })
+    expect(calculateCashback(1590, 'cod')).toEqual({ method: 'cod', percent: 0, coinsEarned: 0, capped: false })
+  })
+
+  it('is earned on what is paid after coins, so coins never earn coins', () => {
+    const seeded = cartOf([1299, 1], [199, 2], [219, 1])
+    const withCoins = calculateOrderTotal(seeded, pct(15, 150, 999), 350) // total 1590
+    const withoutCoins = calculateOrderTotal(seeded, pct(15, 150, 999), 0) // total 1766
+    expect(calculateCashback(withCoins.total, 'shopeepay').coinsEarned).toBe(79)
+    expect(calculateCashback(withoutCoins.total, 'shopeepay').coinsEarned).toBe(88)
+  })
+
+  it('a free order earns nothing', () => {
+    expect(calculateCashback(0, 'shopeepay').coinsEarned).toBe(0)
+  })
+
+  it('respects custom rules', () => {
+    const rules = { ...DEFAULT_PRICING_RULES, shopeePayCashbackPercent: 10, maxCashbackCoins: 50 }
+    expect(calculateCashback(300, 'shopeepay', rules).coinsEarned).toBe(30)
+    expect(calculateCashback(900, 'shopeepay', rules)).toMatchObject({ coinsEarned: 50, capped: true })
   })
 })
 

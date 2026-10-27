@@ -255,12 +255,15 @@ export default function ExamplePage() {
   | `MEGA25`     | percent | 25%, max ₹300        | ₹1,999    |                  |
   | `MONSOON100` | fixed   | ₹100 off             | ₹799      | **already expired** |
 
-- **Coins:** 350. **Orders:** `ORD-1001` (delivered), `ORD-1002` (shipped,
-  imported), `ORD-1003` (out for delivery). **Cart:** pre-filled with
-  3 lines (₹1,916) so checkout can be demoed straight away.
-- Placing an order deducts coins and adds an order **in memory only**. A full
-  page reload resets everything, which is handy between usability-test
-  participants.
+- **Coins:** 350. **Orders:** `ORD-1001` (delivered, UPI), `ORD-1002` (shipped,
+  imported, COD), `ORD-1003` (out for delivery, ShopeePay, +17 Coins).
+  **Cart:** pre-filled with 3 lines (₹1,916) so checkout can be demoed
+  straight away.
+- Placing an order deducts the coins used, credits any ShopeePay cashback and
+  adds an order **in memory only**. A full page reload resets everything,
+  which is handy between usability-test participants. Each order's
+  `pricing.paymentMethod` and `pricing.coinsEarned` are there for order
+  tracking and the wallet.
 - `src/mocks/fixtures.test.ts` checks fixture sanity (unique ids, valid
   ratings, order totals that match the pricing engine). Run `npm test` after
   editing mock data.
@@ -288,9 +291,17 @@ The team agreed these rules on 2026-10-14:
    `min(balance, wanted)`.
 7. **Order of operations:** subtotal → voucher → shipping → coins.
 8. The payable total **never goes below ₹0**.
+9. **ShopeePay cashback** *(proposed 2026-10-27, from the 22 Oct meeting;
+   confirm the rate as a team)*: paying with ShopeePay earns **5% of the
+   payable total back as Coins, rounded down, max 100 per order**. Other UPI
+   apps and COD earn none. It's on what the shopper actually pays, so coins
+   spent never earn coins, and it never changes the total. Use
+   `calculateCashback(total, method)`. In the prototype the Coins land in the
+   balance as soon as the order is placed; a live system would credit them
+   after delivery.
 
 The thresholds live in `DEFAULT_PRICING_RULES`. Worked example (the seeded
-cart with `SAVE15` and coins on):
+cart with `SAVE15`, coins on, paid with ShopeePay):
 
 | Step                                  | Amount      |
 | ------------------------------------- | ----------- |
@@ -300,6 +311,7 @@ cart with `SAVE15` and coins on):
 | Shipping (₹1,766 ≥ ₹499)              | Free        |
 | Coins: cap = floor(10% × 1,766) = 176 | −₹176       |
 | **Total**                             | **₹1,590**  |
+| ShopeePay cashback: floor(5% × 1,590) | +79 Coins   |
 
 ---
 
