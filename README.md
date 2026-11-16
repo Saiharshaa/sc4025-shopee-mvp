@@ -46,6 +46,22 @@ repo is private. So:
   with `npm run dev`, or `npm run build && npm run preview` for the
   production build.
 
+### Using the prototype
+
+- **Start screen:** pick **Shop as a customer** (the shopping app: Home,
+  Search, Cart, Orders, Rewards; bottom tabs on phones) or **Partner view**
+  (the importer dashboard at `/inventory`, US11). "Switch role" is in the
+  header. There's no sign-in; a reload starts a fresh session.
+- **⚙ Demo controls** (bottom-left, shoppers only) switch on unhappy paths for
+  usability tests and the video:
+  - *Make the next payment fail*: ShopeePay/UPI is declined once; checkout
+    keeps the cart, voucher and Coins (US7).
+  - *Delay Blinkit deliveries by 10 min*: tracking shows the new ETA and a
+    running-late notice (US8).
+- **Timing:** a Blinkit order goes Confirmed → Packed → Out for delivery →
+  Delivered over the store's average time (~11 min at HSR Layout), and its
+  ShopeePay Coins are credited when it's delivered (US9).
+
 ---
 
 ## Team & ownership
@@ -73,10 +89,10 @@ ownership rules below still apply if a teammate takes a page on.
 | `/product/:id` | Product detail, trust panel, add to cart | `src/pages/product-detail/` | Person 4 (Tech Lead) |
 | `/cart`        | Cart                     | `src/pages/cart/`           | Person 4 (Tech Lead) |
 | `/checkout`    | Checkout, ShopeePay      | `src/pages/checkout/`       | Person 4 (Tech Lead) |
-| `/wallet`      | Coins + vouchers         | `src/pages/wallet/`         | Person 4 (Tech Lead) |
+| `/wallet`      | Rewards: Coins, pending, expiry, nudge, vouchers | `src/pages/wallet/` | Person 4 (Tech Lead) |
 | `/orders`      | All orders               | `src/pages/orders/`         | Person 4 (Tech Lead) |
 | `/orders/:id`  | Live order tracking      | `src/pages/orders/`         | Person 4 (Tech Lead) |
-| `/inventory`   | Blinkit stock by vendor / dark store | `src/pages/inventory/` | Person 4 (Tech Lead) |
+| `/inventory`   | Importer dashboard (partner role only) | `src/pages/inventory/` | Person 4 (Tech Lead) |
 
 ### Shared files
 
@@ -85,7 +101,9 @@ ownership rules below still apply if a teammate takes a page on.
 | `src/types/index.ts`                  | Every shared type                      | Person 4 (Tech Lead) |
 | `src/mocks/`                          | Mock data + accessor functions         | Person 4 (Tech Lead) |
 | `src/lib/pricing.ts` (+ tests)        | Voucher / coin / shipping engine       | Person 4 (Tech Lead) |
-| `src/lib/inventory.ts` (+ tests)      | Low-stock and registration-renewal rules | Person 4 (Tech Lead) |
+| `src/lib/inventory.ts` (+ tests)      | Days of inventory, low stock (< 7 days), registration renewal | Person 4 (Tech Lead) |
+| `src/lib/rewards.ts` (+ tests)        | Coins expiry, next-reward nudge        | Person 4 (Tech Lead) |
+| `src/hooks/`                          | `useNow`, `useMockData`, cashback crediting job | Person 4 (Tech Lead) |
 | `src/lib/catalogue.ts` (+ tests)      | Search, filters, sorting, deal %, delivery labels | Person 4 (Tech Lead) |
 | `src/lib/tracking.ts` (+ tests)       | Shipments + live Blinkit delivery progress | Person 4 (Tech Lead) |
 | `src/lib/format.ts`                   | `formatRupees`, `formatDate`, `formatDateTime` | Person 4 (Tech Lead) |
@@ -349,10 +367,12 @@ src/
   lib/                    pure functions, each with tests (Person 4)
     pricing.ts            discount engine, best voucher, ShopeePay cashback
     catalogue.ts          search, filters, sorting, deal %, delivery labels
-    inventory.ts          stock + registration status rules
-    tracking.ts           shipments + live Blinkit delivery progress
+    inventory.ts          days of inventory + registration status rules
+    tracking.ts           shipments, four stages, delays, delivered?
+    rewards.ts            Coins expiry + next-reward nudge
     format.ts             formatRupees, formatDate, formatDateTime
-  context/                cart state + useCart() (Person 4)
+  context/                cart, role and demo-controls state (Person 4)
+  hooks/                  useNow, useMockData, useCashbackCrediting (Person 4)
   components/
     layout/               header, nav, page shell (Person 4)
     ui/                   shared UI: ProductCard (Person 4)
