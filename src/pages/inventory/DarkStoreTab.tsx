@@ -1,4 +1,3 @@
-import { Link } from 'react-router'
 import { formatDate } from '../../lib/format'
 import { stockStatus } from '../../lib/inventory'
 import { getProductById, getVendorById } from '../../mocks'
@@ -63,9 +62,7 @@ export default function DarkStoreTab({ stores, stock }: Props) {
                   {lines.map((line) => (
                     <tr key={line.productId}>
                       <th scope="row" className="py-2 pr-3 text-left font-normal">
-                        <Link to={`/product/${line.productId}`} className="hover:text-brand">
-                          {getProductById(line.productId)?.title ?? line.productId}
-                        </Link>
+                        {getProductById(line.productId)?.title ?? line.productId}
                       </th>
                       <td className="px-2 py-2 text-gray-600">{getVendorById(line.vendorId)?.name ?? line.vendorId}</td>
                       <td className="px-2 py-2 text-right">

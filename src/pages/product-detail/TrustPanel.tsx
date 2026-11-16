@@ -1,4 +1,3 @@
-import { Link } from 'react-router'
 import { formatDate } from '../../lib/format'
 import { registrationStatus } from '../../lib/inventory'
 import type { Product, Vendor } from '../../types'
@@ -38,9 +37,6 @@ export default function TrustPanel({ product, vendor }: { product: Product; vend
             </dd>
           </div>
         </dl>
-        <Link to="/inventory" className="mt-1 inline-block text-green-800 underline">
-          See stock and registration details
-        </Link>
       </div>
     )
   }
