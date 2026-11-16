@@ -33,11 +33,31 @@ import { INITIAL_CART } from './data/cart'
 import { DARK_STORES, STOCK, VENDORS } from './data/inventory'
 import { ORDERS } from './data/orders'
 import { CATEGORY_LABELS, PRODUCTS } from './data/products'
-import { INITIAL_COIN_BALANCE, USER } from './data/user'
+import { INITIAL_COIN_BALANCE, INITIAL_COINS_EXPIRE_AT, USER } from './data/user'
 import { VOUCHERS } from './data/vouchers'
 
 // In-memory session state (mutated only by placeOrder).
 let coinBalance = INITIAL_COIN_BALANCE
+/** orderId -> ISO time its ShopeePay cashback was credited. */
+const creditedAt = new Map<string, string>()
+
+// Change notifications, so pages showing session state re-render when it changes
+// outside a user action (e.g. cashback credited on delivery). See hooks/useMockData.
+let version = 0
+const listeners = new Set<() => void>()
+function changed() {
+  version++
+  listeners.forEach((listener) => listener())
+}
+
+export function subscribe(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
+}
+
+export function getVersion(): number {
+  return version
+}
 const orders: Order[] = [...ORDERS]
 const stock: StockRecord[] = STOCK.map((s) => ({ ...s }))
 
@@ -116,9 +136,33 @@ export function getVoucherByCode(code: string): Voucher | undefined {
   return VOUCHERS.find((v) => v.code === normalised)
 }
 
-/** Current Shopee Coins balance (1 coin = Rs 1). */
+/** Spendable Shopee Coins (1 coin = Rs 1). Cashback only counts once credited. */
 export function getCoinBalance(): number {
   return coinBalance
+}
+
+/** When the starting balance expires. Credited cashback expires per src/lib/rewards.ts. */
+export function getInitialCoinsExpiry(): string {
+  return INITIAL_COINS_EXPIRE_AT
+}
+
+/**
+ * US9: credit an order's ShopeePay cashback once it has been delivered.
+ * Idempotent: returns the Coins credited by THIS call (0 if already done or
+ * nothing was earned). The caller decides delivery (isOrderDelivered).
+ */
+export function creditCashback(orderId: string, at: Date = new Date()): number {
+  const order = orders.find((o) => o.id === orderId)
+  if (!order || order.pricing.coinsEarned === 0 || creditedAt.has(orderId)) return 0
+  creditedAt.set(orderId, at.toISOString())
+  coinBalance += order.pricing.coinsEarned
+  changed()
+  return order.pricing.coinsEarned
+}
+
+/** ISO time the order's cashback was credited, or undefined while pending. */
+export function getCashbackCreditedAt(orderId: string): string | undefined {
+  return creditedAt.get(orderId)
 }
 
 // ---------------------------------------------------------------------------
@@ -156,13 +200,11 @@ export function getOrderById(id: string): Order | undefined {
 }
 
 /**
- * Record a new order from checkout, deduct the coins it used and credit any
- * ShopeePay cashback (rule 9 in src/lib/pricing.ts). Global Picks are sent
- * from the Blinkit store serving the delivery pincode, and its stock goes down.
+ * Record a new order from checkout and deduct the coins it used. Its ShopeePay
+ * cashback (rule 9 in src/lib/pricing.ts) is recorded but only credited after
+ * delivery (creditCashback). Global Picks are sent from the Blinkit store
+ * serving the delivery pincode, and its stock goes down.
  * `breakdown` must be the result of calculateOrderTotal() for this cart.
- *
- * Cashback is credited straight away so a demo can show it in the wallet; a
- * live system would credit it once the order is delivered.
  */
 export function placeOrder(
   cart: Cart,
@@ -221,8 +263,9 @@ export function placeOrder(
     const line = stockLines[i]
     if (line) line.units -= quantity
   })
-  coinBalance += cashback.coinsEarned - breakdown.coins.applied
+  coinBalance -= breakdown.coins.applied
   orders.push(order)
+  changed()
   return order
 }
 

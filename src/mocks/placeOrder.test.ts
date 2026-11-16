@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import { calculateOrderTotal } from '../lib/pricing'
 import type { Cart } from '../types'
-import { getBlinkitAvailability, getCoinBalance, getOrders, getProductById, getUser, placeOrder } from './index'
+import {
+  creditCashback,
+  getBlinkitAvailability,
+  getCashbackCreditedAt,
+  getCoinBalance,
+  getOrders,
+  getProductById,
+  getUser,
+  placeOrder,
+} from './index'
 
 // placeOrder changes in-memory state, so these tests run in order and build on each other.
 
@@ -23,15 +32,23 @@ describe('placeOrder', () => {
     expect(getBlinkitAvailability('p023')!.units).toBe(before.units - 2)
   })
 
-  it('credits ShopeePay cashback and deducts coins used', () => {
+  it('deducts coins used now, and credits ShopeePay cashback only once delivered (US9)', () => {
     const balance = getCoinBalance()
     const cart = cartOf(['p024', 1]) // 1199, cap 119 coins
     const breakdown = calculateOrderTotal(cart, null, 50)
 
     const order = placeOrder(cart, breakdown, address, 'shopeepay')
 
-    // 1199 + 0 shipping - 50 coins = 1149 -> 5% = 57
+    // 1199 + 0 shipping - 50 coins = 1149 -> 5% = 57, pending until delivery
     expect(order.pricing).toMatchObject({ total: 1149, coinsUsed: 50, coinsEarned: 57, paymentMethod: 'shopeepay' })
+    expect(getCoinBalance()).toBe(balance - 50)
+    expect(getCashbackCreditedAt(order.id)).toBeUndefined()
+
+    expect(creditCashback(order.id, new Date('2026-11-16T12:00:00Z'))).toBe(57)
+    expect(getCoinBalance()).toBe(balance - 50 + 57)
+    expect(getCashbackCreditedAt(order.id)).toBe('2026-11-16T12:00:00.000Z')
+
+    expect(creditCashback(order.id)).toBe(0) // never twice
     expect(getCoinBalance()).toBe(balance - 50 + 57)
   })
 

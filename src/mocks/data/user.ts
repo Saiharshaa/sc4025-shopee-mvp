@@ -22,3 +22,6 @@ export const USER: User = {
 
 /** Starting Shopee Coins balance (1 coin = Rs 1). */
 export const INITIAL_COIN_BALANCE = 350
+
+/** When the starting balance expires (it was credited before the fixtures' orders). */
+export const INITIAL_COINS_EXPIRE_AT = '2027-03-31T23:59:59+05:30'
