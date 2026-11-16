@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router'
 import { getDarkStores, getStockRecords, getVendors } from '../../mocks'
 import { useMockData } from '../../hooks/useMockData'
 import DarkStoreTab from './DarkStoreTab'
+import { LOW_STOCK_NOTE } from './StatusBadges'
 import VendorTab from './VendorTab'
 
 /**
@@ -54,11 +55,11 @@ export default function InventoryPage() {
 
   return (
     <section>
-      <h1 className="text-2xl font-bold">Global Picks inventory at Blinkit</h1>
+      <h1 className="text-2xl font-bold">Importer dashboard</h1>
       <p className="mt-1 max-w-3xl text-sm text-gray-600">
         Brand-authorised importers own this stock and keep it in Blinkit dark stores, so trending imports reach shoppers
-        in minutes, not weeks. See who holds each product, their import registration, and how many units are on the
-        shelf.
+        in minutes, not weeks. See each importer's registration, units on the shelf in every dark store, and how many
+        days that stock will last. {LOW_STOCK_NOTE}
       </p>
       <p className="mt-2 text-sm font-medium">
         {vendors.length} importers · {stores.length} dark stores in {stores[0]?.city} · {productCount} products ·{' '}

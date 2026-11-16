@@ -64,6 +64,7 @@ describe('inventory fixtures', () => {
     expect(vendor).toBeDefined()
     expect(storeIds.has(s.darkStoreId)).toBe(true)
     expect(Number.isInteger(s.units) && s.units >= 0).toBe(true)
+    expect(s.avgDailySales).toBeGreaterThanOrEqual(0)
 
     // Global Picks promise: verified imports, sold by an importer the brand authorised, delivered same day.
     expect(product!.seller).toBe(vendor!.name)

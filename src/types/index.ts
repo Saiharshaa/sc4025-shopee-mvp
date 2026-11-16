@@ -333,6 +333,8 @@ export interface StockRecord {
   darkStoreId: string
   /** Integer ≥ 0. */
   units: number
+  /** Average units sold per day here, over the last 14 days (US11 days of inventory). */
+  avgDailySales: number
   /** ISO 8601 timestamp. */
   lastRestockedAt: string
 }
