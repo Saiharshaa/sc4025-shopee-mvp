@@ -174,7 +174,7 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
 
    | Accessor                  | Returns                                               |
    | ------------------------- | ----------------------------------------------------- |
-   | `getProducts()`           | All 27 products (fresh array, safe to sort/filter)    |
+   | `getProducts()`           | All 30 products (fresh array, safe to sort/filter)    |
    | `getProductById(id)`      | One product, or `undefined`                           |
    | `getCategories()`         | `{ id, label }[]` for the 6 categories                |
    | `getVouchers()`           | All vouchers, including expired ones                  |
@@ -245,11 +245,11 @@ export default function ExamplePage() {
 
 ## Mock data
 
-- **27 products** across 6 categories. They mix imported and local,
+- **30 products** across 6 categories. They mix imported and local,
   verified and unverified sellers, and all three speed tiers
   (`standard` / `express` / `same-day`). Products with `originalPrice` are
   on deal.
-- **Global Picks** (`p023`–`p027`): trending K-beauty imports pre-stocked in
+- **Global Picks** (`p023`–`p030`): trending K-beauty imports pre-stocked in
   Blinkit dark stores, so they're `same-day`. Each is held by one of
   2 brand-authorised importers across 3 Bengaluru dark stores (the pilot
   city). The stock deliberately includes low (≤ 5) and out-of-stock lines, and

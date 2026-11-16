@@ -51,6 +51,10 @@ export const STOCK: StockRecord[] = [
   { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-kor', units: 15, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
   { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-ind', units: 0, lastRestockedAt: '2026-10-12T06:45:00+05:30' },
 
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-hsr', units: 14, lastRestockedAt: '2026-11-12T06:30:00+05:30' },
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-kor', units: 10, lastRestockedAt: '2026-11-12T07:10:00+05:30' },
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-ind', units: 8, lastRestockedAt: '2026-11-10T06:45:00+05:30' },
+
   // Seoul Shelf India
   { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-hsr', units: 20, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
   { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-kor', units: 0, lastRestockedAt: '2026-10-15T08:20:00+05:30' },
@@ -58,4 +62,11 @@ export const STOCK: StockRecord[] = [
   { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-hsr', units: 8, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
   { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-kor', units: 6, lastRestockedAt: '2026-10-22T08:20:00+05:30' },
   { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-ind', units: 5, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
+  // Out of stock at HSR (the demo shopper's store), so US1/US3's "Out of stock" + "Notify me" path shows.
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-hsr', units: 0, lastRestockedAt: '2026-11-02T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-kor', units: 9, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-ind', units: 6, lastRestockedAt: '2026-11-12T09:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-hsr', units: 16, lastRestockedAt: '2026-11-12T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-kor', units: 11, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-ind', units: 3, lastRestockedAt: '2026-11-10T09:00:00+05:30' },
 ]

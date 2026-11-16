@@ -85,6 +85,15 @@ describe('inventory fixtures', () => {
     expect(getBlinkitAvailability('p001')).toBeUndefined()
   })
 
+  it('has at least 8 Global Picks for the trending shelf (US1), each with origin, batch and expiry (US2)', () => {
+    const globalPicks = [...new Set(stock.map((s) => s.productId))].map((id) => getProductById(id)!)
+    expect(globalPicks.length).toBeGreaterThanOrEqual(8)
+    for (const p of globalPicks) {
+      expect(p.authenticity, p.id).toBeDefined()
+      expect(Date.parse(p.authenticity!.expiryDate)).toBeGreaterThan(Date.parse('2027-01-01'))
+    }
+  })
+
   it('each product is held by exactly one vendor', () => {
     const vendorsByProduct = new Map<string, Set<string>>()
     for (const s of stock) {
