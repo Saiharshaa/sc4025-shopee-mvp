@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { formatDate } from '../../lib/format'
 import { getProductById } from '../../mocks'
 import type { DarkStore, StockRecord, Vendor } from '../../types'
-import { RegistrationBadge, UnitCount } from './StatusBadges'
+import { RegistrationBadge, StockCell } from './StatusBadges'
 
 /** OWNER: Person 4 (Tech Lead). One card per importer: registration, then units per dark store. */
 
@@ -18,8 +18,8 @@ export default function VendorTab({ vendors, stores, stock }: Props) {
       {vendors.map((vendor) => {
         const lines = stock.filter((s) => s.vendorId === vendor.id)
         const productIds = [...new Set(lines.map((s) => s.productId))]
-        const unitsAt = (productId: string, storeId: string) =>
-          lines.find((s) => s.productId === productId && s.darkStoreId === storeId)?.units
+        const lineAt = (productId: string, storeId: string) =>
+          lines.find((s) => s.productId === productId && s.darkStoreId === storeId)
 
         return (
           <article key={vendor.id} aria-labelledby={`vendor-${vendor.id}`} className="rounded-lg bg-white p-4 shadow-sm">
@@ -51,7 +51,7 @@ export default function VendorTab({ vendors, stores, stock }: Props) {
               </Field>
             </dl>
 
-            <div className="mt-4 overflow-x-auto">
+            <div className="relative mt-4 overflow-x-auto">
               <table className="w-full min-w-md text-sm">
                 <caption className="sr-only">Units of each {vendor.name} product per Blinkit dark store</caption>
                 <thead>
@@ -78,10 +78,14 @@ export default function VendorTab({ vendors, stores, stock }: Props) {
                           {getProductById(productId)?.title ?? productId}
                         </th>
                         {stores.map((store) => {
-                          const units = unitsAt(productId, store.id)
+                          const line = lineAt(productId, store.id)
                           return (
                             <td key={store.id} className="px-2 py-2 text-right">
-                              {units === undefined ? <span className="text-gray-400">not stocked</span> : <UnitCount units={units} />}
+                              {line ? (
+                                <StockCell units={line.units} avgDailySales={line.avgDailySales} />
+                              ) : (
+                                <span className="text-gray-400">not stocked</span>
+                              )}
                             </td>
                           )
                         })}
