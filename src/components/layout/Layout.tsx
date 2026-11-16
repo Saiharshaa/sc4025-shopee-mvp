@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { useRole } from '../../context/useRole'
+import DemoPanel from './DemoPanel'
 import Header from './Header'
 import RolePicker from './RolePicker'
 
@@ -37,6 +38,7 @@ export default function Layout() {
       >
         SC4025 prototype · mock data only, no real transactions
       </footer>
+      {role === 'shopper' && <DemoPanel />}
     </div>
   )
 }
