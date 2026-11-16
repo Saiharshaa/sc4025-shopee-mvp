@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router'
 import { formatDate } from '../../lib/format'
 import { getProductById } from '../../mocks'
 import type { DarkStore, StockRecord, Vendor } from '../../types'
@@ -76,9 +75,7 @@ export default function VendorTab({ vendors, stores, stock }: Props) {
                     return (
                       <tr key={productId}>
                         <th scope="row" className="py-2 pr-3 text-left font-normal">
-                          <Link to={`/product/${productId}`} className="hover:text-brand">
-                            {getProductById(productId)?.title ?? productId}
-                          </Link>
+                          {getProductById(productId)?.title ?? productId}
                         </th>
                         {stores.map((store) => {
                           const units = unitsAt(productId, store.id)

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { formatDate, formatRupees } from '../../lib/format'
 import { evaluateVoucher } from '../../lib/pricing'
 import type { Voucher } from '../../types'
@@ -14,13 +15,56 @@ interface Props {
 }
 
 export default function VoucherPicker({ vouchers, subtotal, selectedCode, bestCode, onSelect }: Props) {
+  // US5: collapsed to the applied voucher; "Change" opens the full list.
+  const [expanded, setExpanded] = useState(false)
+  const selected = vouchers.find((v) => v.code === selectedCode)
+
+  if (!expanded) {
+    return (
+      <div className="rounded-lg bg-white p-4 shadow-sm">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="font-semibold">Shopee Voucher</h2>
+            {selected ? (
+              <p className="text-sm">
+                <span className="font-medium">{selected.title}</span>{' '}
+                <span className="text-brand">· saves {formatRupees(evaluateVoucher(selected, subtotal).discount)}</span>
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">No voucher applied</p>
+            )}
+            {selectedCode !== null && selectedCode === bestCode && (
+              <p className="text-xs text-green-700">Best deal applied for you</p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="flex-none rounded border border-gray-300 px-3 py-1 text-sm font-medium hover:border-brand hover:text-brand"
+          >
+            Change
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <fieldset className="rounded-lg bg-white p-4 shadow-sm">
       <legend className="sr-only">Voucher</legend>
-      <h2 className="font-semibold">Shopee Voucher</h2>
-      <p className="text-xs text-gray-500">
-        One voucher per order.{bestCode && selectedCode === bestCode && ' We applied the one that saves you the most.'}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold">Shopee Voucher</h2>
+          <p className="text-xs text-gray-500">One voucher per order.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="flex-none rounded bg-brand px-3 py-1 text-sm font-semibold text-white"
+        >
+          Done
+        </button>
+      </div>
 
       <div className="mt-3 space-y-2">
         <label className="flex cursor-pointer items-center gap-3 rounded border border-gray-200 p-3 has-checked:border-brand">

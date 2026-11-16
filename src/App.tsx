@@ -35,7 +35,7 @@ export default function App() {
         {/* Person 4 (Tech Lead) */}
         <Route path="orders" element={<OrdersPage />} />
         <Route path="orders/:id" element={<OrderTrackingPage />} />
-        {/* Person 4 (Tech Lead) */}
+        {/* Person 4 (Tech Lead). Partner role only (see Layout) */}
         <Route path="inventory" element={<InventoryPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

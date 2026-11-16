@@ -34,7 +34,7 @@ export default function PriceBreakdown({ breakdown }: { breakdown: OrderBreakdow
         )}
 
         <Row
-          label="Shipping fee"
+          label="Delivery fee"
           value={
             shipping.waived ? (
               <>
@@ -52,6 +52,9 @@ export default function PriceBreakdown({ breakdown }: { breakdown: OrderBreakdow
           }
         />
 
+        {/* US6: every fee is listed before Pay. We charge no handling or platform fee. */}
+        <Row label="Handling fee" value={<span className="text-green-700">Free</span>} />
+
         {coins.requested > 0 && (
           <Row
             label={`Shopee Coins (${coins.applied})`}
@@ -62,7 +65,9 @@ export default function PriceBreakdown({ breakdown }: { breakdown: OrderBreakdow
         )}
 
         <div className="flex items-baseline justify-between border-t border-gray-200 pt-3">
-          <dt className="font-semibold">Total payment</dt>
+          <dt className="font-semibold">
+            Total payment <span className="block text-xs font-normal text-gray-500">incl. GST · the amount you pay</span>
+          </dt>
           <dd className="text-xl font-bold text-brand">{formatRupees(breakdown.total)}</dd>
         </div>
       </dl>

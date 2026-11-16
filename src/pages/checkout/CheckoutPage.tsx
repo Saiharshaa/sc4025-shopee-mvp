@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { useCart } from '../../context/useCart'
+import { useDemo } from '../../context/useDemo'
 import { formatRupees } from '../../lib/format'
 import { bestVoucher, calculateCashback, calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
 import { getCoinBalance, getUser, getVouchers, placeOrder } from '../../mocks'
 import type { PaymentMethod } from '../../types'
+import PayConfirmSheet from './PayConfirmSheet'
 import PaymentMethodPicker from './PaymentMethodPicker'
 import PriceBreakdown from './PriceBreakdown'
 import VoucherPicker from './VoucherPicker'
@@ -27,6 +29,9 @@ export default function CheckoutPage() {
   const [useCoins, setUseCoins] = useState(true)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('shopeepay')
   const [error, setError] = useState<string | null>(null)
+  const [payStep, setPayStep] = useState<'idle' | 'confirm' | 'processing'>('idle')
+  const [paymentFailed, setPaymentFailed] = useState(false)
+  const { demo, setDemo } = useDemo()
 
   if (cart.items.length === 0) {
     return (
@@ -60,19 +65,61 @@ export default function CheckoutPage() {
           paymentMethod
         ]
 
-  function handlePlaceOrder() {
-    try {
-      const order = placeOrder(cart, breakdown, address, paymentMethod)
-      clearCart()
-      navigate(`/orders/${order.id}`, { state: { justPlaced: true } })
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not place the order')
-    }
+  // ShopeePay asks for one confirmation (US7); other methods go straight to payment.
+  function handlePay() {
+    setError(null)
+    setPaymentFailed(false)
+    if (paymentMethod === 'shopeepay' && breakdown.total > 0) setPayStep('confirm')
+    else submitPayment()
+  }
+
+  // Simulated payment. A failure leaves the cart, voucher and Coins untouched (US7).
+  function submitPayment() {
+    setPayStep('processing')
+    window.setTimeout(() => {
+      if (demo.failNextPayment && paymentMethod !== 'cod' && breakdown.total > 0) {
+        setDemo({ failNextPayment: false })
+        setPayStep('idle')
+        setPaymentFailed(true)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
+      try {
+        const order = placeOrder(cart, breakdown, address, paymentMethod)
+        clearCart()
+        navigate(`/orders/${order.id}`, { state: { justPlaced: true } })
+      } catch (e) {
+        setPayStep('idle')
+        setError(e instanceof Error ? e.message : 'Could not place the order')
+      }
+    }, 900)
   }
 
   return (
     <section>
       <h1 className="text-2xl font-bold">Checkout</h1>
+
+      {paymentFailed && (
+        <div role="alert" className="mt-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <p className="font-semibold">Payment didn't go through</p>
+          <p className="mt-1">
+            Your bank declined the payment and you haven't been charged. Your cart, voucher and Coins are just as you left
+            them.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={handlePay} className="rounded bg-brand px-3 py-1.5 font-semibold text-white">
+              Try again
+            </button>
+            <button
+              type="button"
+              onClick={() => document.getElementById('payment-method')?.scrollIntoView({ behavior: 'smooth' })}
+              className="rounded border border-red-300 bg-white px-3 py-1.5 font-medium"
+            >
+              Pay another way
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-4">
@@ -128,7 +175,12 @@ export default function CheckoutPage() {
             </label>
           </div>
 
-          <PaymentMethodPicker selected={paymentMethod} onSelect={setPaymentMethod} shopeePayCoins={shopeePayCoins} />
+          <PaymentMethodPicker
+            id="payment-method"
+            selected={paymentMethod}
+            onSelect={setPaymentMethod}
+            shopeePayCoins={shopeePayCoins}
+          />
         </div>
 
         <aside className="h-fit rounded-lg bg-white p-4 shadow-sm lg:sticky lg:top-20">
@@ -150,13 +202,24 @@ export default function CheckoutPage() {
           )}
           <button
             type="button"
-            onClick={handlePlaceOrder}
-            className="mt-4 w-full rounded bg-brand py-2.5 font-semibold text-white hover:bg-brand-dark"
+            onClick={handlePay}
+            disabled={payStep !== 'idle'}
+            className="mt-4 w-full rounded bg-brand py-2.5 font-semibold text-white hover:bg-brand-dark disabled:opacity-70"
           >
-            {payLabel}
+            {payStep === 'processing' && paymentMethod !== 'shopeepay' ? 'Processing…' : payLabel}
           </button>
         </aside>
       </div>
+
+      <PayConfirmSheet
+        open={payStep !== 'idle' && paymentMethod === 'shopeepay'}
+        processing={payStep === 'processing'}
+        amount={breakdown.total}
+        coinsEarned={coinsEarned}
+        upiId={`${user.name.split(' ')[0].toLowerCase()}@shopeepay`}
+        onConfirm={submitPayment}
+        onCancel={() => setPayStep('idle')}
+      />
     </section>
   )
 }

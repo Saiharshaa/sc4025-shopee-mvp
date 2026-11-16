@@ -38,19 +38,25 @@ export default function OrderTrackingPage() {
   return (
     <section>
       {justPlaced && (
-        <p role="status" className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800">
-          <strong>Order placed.</strong>
+        <div role="status" className="mb-4 rounded-lg bg-green-50 p-4 text-green-900">
+          <p className="text-lg font-bold">
+            ✓ {pricing.paymentMethod === 'cod' ? 'Order placed' : 'Payment successful'}
+          </p>
+          <p className="mt-1 text-sm">
+            Order <strong>{order.id}</strong> is confirmed.{' '}
+            {pricing.paymentMethod === 'cod'
+              ? `Pay ${formatRupees(pricing.total)} when it arrives.`
+              : `${formatRupees(pricing.total)} paid with ${PAYMENT_METHOD_LABELS[pricing.paymentMethod]}.`}
+          </p>
           {pricing.coinsEarned > 0 && (
-            <>
-              {' '}
-              {pricing.coinsEarned} Shopee Coins are in your{' '}
+            <p className="mt-1 text-sm">
+              🪙 <strong>+{pricing.coinsEarned} Shopee Coins</strong> earned.{' '}
               <Link to="/wallet" className="underline">
-                wallet
-              </Link>{' '}
-              for next time.
-            </>
+                See Rewards
+              </Link>
+            </p>
           )}
-        </p>
+        </div>
       )}
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
