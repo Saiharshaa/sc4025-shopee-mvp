@@ -1,18 +1,26 @@
 import { describe, expect, it } from 'vitest'
-import { LOW_STOCK_THRESHOLD, RENEWAL_WARNING_DAYS, registrationStatus, stockStatus } from './inventory'
+import { LOW_STOCK_DAYS, RENEWAL_WARNING_DAYS, daysOfInventory, registrationStatus, stockStatus } from './inventory'
 
-describe('stockStatus', () => {
+describe('daysOfInventory', () => {
+  it('is units divided by average daily sales', () => {
+    expect(daysOfInventory(24, 3.5)).toBeCloseTo(6.86, 2)
+  })
+
+  it('is 0 when out of stock and infinite when nothing is selling', () => {
+    expect(daysOfInventory(0, 2)).toBe(0)
+    expect(daysOfInventory(10, 0)).toBe(Number.POSITIVE_INFINITY)
+  })
+})
+
+describe('stockStatus (US11)', () => {
   it('0 units is out of stock', () => {
-    expect(stockStatus(0)).toBe('out')
+    expect(stockStatus(0, 1)).toBe('out')
   })
 
-  it('is low from 1 up to the threshold (inclusive)', () => {
-    expect(stockStatus(1)).toBe('low')
-    expect(stockStatus(LOW_STOCK_THRESHOLD)).toBe('low')
-  })
-
-  it('is in stock above the threshold', () => {
-    expect(stockStatus(LOW_STOCK_THRESHOLD + 1)).toBe('in-stock')
+  it('is low below 7 days of inventory, in stock from 7 days', () => {
+    expect(stockStatus(24, 3.5)).toBe('low') // 6.9 days
+    expect(stockStatus(LOW_STOCK_DAYS * 2, 2)).toBe('in-stock') // exactly 7 days
+    expect(stockStatus(3, 0)).toBe('in-stock') // not selling, never runs out
   })
 })
 

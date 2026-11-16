@@ -38,35 +38,36 @@ export const DARK_STORES: DarkStore[] = [
   { id: 'ds-ind', name: 'Blinkit Indiranagar', area: 'Indiranagar', city: 'Bengaluru', avgDeliveryMinutes: 17, pincodes: ['560038', '560008'] },
 ]
 
-// Mix of healthy, low (<= 5) and out-of-stock lines so every status shows up.
+// Mix of healthy, low (under 7 days of inventory at avgDailySales) and
+// out-of-stock lines so every status shows up on the partner dashboard.
 export const STOCK: StockRecord[] = [
   // K-Glow Imports
-  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-hsr', units: 24, lastRestockedAt: '2026-10-24T06:30:00+05:30' },
-  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-kor', units: 18, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
-  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-ind', units: 4, lastRestockedAt: '2026-10-19T06:45:00+05:30' },
-  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-hsr', units: 12, lastRestockedAt: '2026-10-24T06:30:00+05:30' },
-  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-kor', units: 9, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
-  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-ind', units: 7, lastRestockedAt: '2026-10-19T06:45:00+05:30' },
-  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-hsr', units: 3, lastRestockedAt: '2026-10-17T06:30:00+05:30' },
-  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-kor', units: 15, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
-  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-ind', units: 0, lastRestockedAt: '2026-10-12T06:45:00+05:30' },
+  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-hsr', units: 24, avgDailySales: 3.5, lastRestockedAt: '2026-10-24T06:30:00+05:30' },
+  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-kor', units: 18, avgDailySales: 3.2, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
+  { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-ind', units: 4, avgDailySales: 2.4, lastRestockedAt: '2026-10-19T06:45:00+05:30' },
+  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-hsr', units: 12, avgDailySales: 1.2, lastRestockedAt: '2026-10-24T06:30:00+05:30' },
+  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-kor', units: 9, avgDailySales: 1.1, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
+  { vendorId: 'v001', productId: 'p024', darkStoreId: 'ds-ind', units: 7, avgDailySales: 0.8, lastRestockedAt: '2026-10-19T06:45:00+05:30' },
+  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-hsr', units: 3, avgDailySales: 0.8, lastRestockedAt: '2026-10-17T06:30:00+05:30' },
+  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-kor', units: 15, avgDailySales: 0.7, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
+  { vendorId: 'v001', productId: 'p025', darkStoreId: 'ds-ind', units: 0, avgDailySales: 0.6, lastRestockedAt: '2026-10-12T06:45:00+05:30' },
 
-  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-hsr', units: 14, lastRestockedAt: '2026-11-12T06:30:00+05:30' },
-  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-kor', units: 10, lastRestockedAt: '2026-11-12T07:10:00+05:30' },
-  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-ind', units: 8, lastRestockedAt: '2026-11-10T06:45:00+05:30' },
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-hsr', units: 14, avgDailySales: 1, lastRestockedAt: '2026-11-12T06:30:00+05:30' },
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-kor', units: 10, avgDailySales: 0.9, lastRestockedAt: '2026-11-12T07:10:00+05:30' },
+  { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-ind', units: 8, avgDailySales: 0.7, lastRestockedAt: '2026-11-10T06:45:00+05:30' },
 
   // Seoul Shelf India
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-hsr', units: 20, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-kor', units: 0, lastRestockedAt: '2026-10-15T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-ind', units: 11, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-hsr', units: 8, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-kor', units: 6, lastRestockedAt: '2026-10-22T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-ind', units: 5, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-hsr', units: 20, avgDailySales: 2, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-kor', units: 0, avgDailySales: 1.8, lastRestockedAt: '2026-10-15T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-ind', units: 11, avgDailySales: 1.4, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-hsr', units: 8, avgDailySales: 0.9, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-kor', units: 6, avgDailySales: 0.8, lastRestockedAt: '2026-10-22T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-ind', units: 5, avgDailySales: 0.6, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
   // Out of stock at HSR (the demo shopper's store), so US1/US3's "Out of stock" + "Notify me" path shows.
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-hsr', units: 0, lastRestockedAt: '2026-11-02T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-kor', units: 9, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-ind', units: 6, lastRestockedAt: '2026-11-12T09:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-hsr', units: 16, lastRestockedAt: '2026-11-12T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-kor', units: 11, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-ind', units: 3, lastRestockedAt: '2026-11-10T09:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-hsr', units: 0, avgDailySales: 1.5, lastRestockedAt: '2026-11-02T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-kor', units: 9, avgDailySales: 1.4, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-ind', units: 6, avgDailySales: 1, lastRestockedAt: '2026-11-12T09:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-hsr', units: 16, avgDailySales: 1.2, lastRestockedAt: '2026-11-12T08:00:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-kor', units: 11, avgDailySales: 1.1, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-ind', units: 3, avgDailySales: 0.8, lastRestockedAt: '2026-11-10T09:00:00+05:30' },
 ]
