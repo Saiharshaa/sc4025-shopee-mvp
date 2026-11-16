@@ -97,7 +97,9 @@ export function getDarkStoreForPincode(pincode: string): DarkStore | undefined {
 export function getBlinkitAvailability(productId: string): BlinkitAvailability | undefined {
   const store = getDarkStoreForPincode(USER.defaultAddress.pincode)
   const record = store && stock.find((s) => s.productId === productId && s.darkStoreId === store.id)
-  return store && record ? { store, units: record.units } : undefined
+  return store && record
+    ? { store, units: record.units, vendorId: record.vendorId, lastRestockedAt: record.lastRestockedAt }
+    : undefined
 }
 
 // ---------------------------------------------------------------------------

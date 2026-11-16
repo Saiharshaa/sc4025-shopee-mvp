@@ -41,6 +41,13 @@ export interface Product {
   /** Average rating, 0–5, one decimal place. */
   rating: number
   category: Category
+  /** Global Picks only: what the shopper can check on the product page (US2). */
+  authenticity?: {
+    countryOfOrigin: string
+    batchNo: string
+    /** ISO 8601 date. */
+    expiryDate: string
+  }
 }
 
 /** Listing filters (see filterProducts in src/lib/catalogue.ts). */
@@ -313,6 +320,10 @@ export interface DarkStore {
 export interface BlinkitAvailability {
   store: DarkStore
   units: number
+  /** Seller of record holding the stock. */
+  vendorId: string
+  /** ISO 8601 timestamp. */
+  lastRestockedAt: string
 }
 
 /** Units of one product that one vendor keeps in one dark store. */
