@@ -8,6 +8,7 @@ import type { PaymentMethod } from '../../types'
  */
 
 interface Props {
+  id?: string
   selected: PaymentMethod
   onSelect: (method: PaymentMethod) => void
   /** Coins this order would earn if paid with ShopeePay. */
@@ -26,9 +27,9 @@ const OPTIONS: { method: PaymentMethod; label: string; detail: string }[] = [
   { method: 'cod', label: 'Cash on delivery', detail: 'Pay when it arrives. No Coins back' },
 ]
 
-export default function PaymentMethodPicker({ selected, onSelect, shopeePayCoins }: Props) {
+export default function PaymentMethodPicker({ id, selected, onSelect, shopeePayCoins }: Props) {
   return (
-    <fieldset className="rounded-lg bg-white p-4 shadow-sm">
+    <fieldset id={id} className="scroll-mt-20 rounded-lg bg-white p-4 shadow-sm">
       <legend className="sr-only">Payment method</legend>
       <h2 className="font-semibold">Payment method</h2>
 
