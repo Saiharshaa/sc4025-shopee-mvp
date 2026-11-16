@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
 import { Link, useLocation, useParams } from 'react-router'
+import { useDemo } from '../../context/useDemo'
+import { useNow } from '../../hooks/useNow'
 import { PAYMENT_METHOD_LABELS, formatDateTime, formatRupees } from '../../lib/format'
 import { splitShipments } from '../../lib/tracking'
-import { getDarkStores, getOrderById } from '../../mocks'
+import { getCashbackCreditedAt, getDarkStores, getOrderById } from '../../mocks'
+import { useMockData } from '../../hooks/useMockData'
 import { BlinkitShipment, SellerShipment } from './Shipments'
-import { useNow } from './useNow'
 
 /**
  * Route:  /orders/:id
@@ -15,9 +17,11 @@ import { useNow } from './useNow'
  *         Shipment and progress rules live in src/lib/tracking.ts.
  */
 export default function OrderTrackingPage() {
+  useMockData()
   const { id = '' } = useParams()
   const { state } = useLocation()
   const now = useNow(15_000)
+  const { demo } = useDemo()
   const order = getOrderById(id)
 
   if (!order) {
@@ -50,7 +54,7 @@ export default function OrderTrackingPage() {
           </p>
           {pricing.coinsEarned > 0 && (
             <p className="mt-1 text-sm">
-              🪙 <strong>+{pricing.coinsEarned} Shopee Coins</strong> earned.{' '}
+              🪙 <strong>+{pricing.coinsEarned} Shopee Coins</strong> earned, credited once it's delivered.{' '}
               <Link to="/wallet" className="underline">
                 See Rewards
               </Link>
@@ -73,7 +77,14 @@ export default function OrderTrackingPage() {
             if (shipment.kind === 'seller') return <SellerShipment key="seller" order={order} items={shipment.items} />
             const store = stores.find((s) => s.id === shipment.darkStoreId)
             return store ? (
-              <BlinkitShipment key={store.id} order={order} store={store} items={shipment.items} now={now} />
+              <BlinkitShipment
+                key={store.id}
+                order={order}
+                store={store}
+                items={shipment.items}
+                now={now}
+                delayMinutes={demo.delayMinutes}
+              />
             ) : null
           })}
         </div>
@@ -104,7 +115,10 @@ export default function OrderTrackingPage() {
               </div>
             </dl>
             {pricing.coinsEarned > 0 && (
-              <p className="mt-2 rounded bg-brand-light p-2 text-brand-dark">+{pricing.coinsEarned} Shopee Coins earned with ShopeePay</p>
+              <p className="mt-2 rounded bg-brand-light p-2 text-brand-dark">
+                +{pricing.coinsEarned} Shopee Coins from ShopeePay ·{' '}
+                {getCashbackCreditedAt(order.id) ? 'credited to Rewards' : 'credited after delivery'}
+              </p>
             )}
           </div>
         </aside>

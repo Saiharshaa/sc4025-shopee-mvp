@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Order, OrderItem } from '../types'
-import { quickDeliveryProgress, splitShipments } from './tracking'
+import { isOrderDelivered, quickDeliveryProgress, splitShipments } from './tracking'
 
 const item = (productId: string, darkStoreId?: string): OrderItem => ({
   productId,
@@ -34,22 +34,38 @@ describe('quickDeliveryProgress', () => {
   const placedAt = '2026-10-27T12:00:00+05:30'
   const at = (minutes: number) => new Date(Date.parse(placedAt) + minutes * 60_000)
 
-  it('is packing for the first 20% of the ETA', () => {
-    expect(quickDeliveryProgress(placedAt, 10, at(0))).toEqual({ stage: 'packing', minutesLeft: 10, fraction: 0 })
-    expect(quickDeliveryProgress(placedAt, 10, at(1.9)).stage).toBe('packing')
+  it('goes Confirmed -> Packed -> Out for delivery -> Delivered (US8)', () => {
+    expect(quickDeliveryProgress(placedAt, 10, at(0))).toEqual({ stage: 'confirmed', minutesLeft: 10, fraction: 0, delayed: false })
+    expect(quickDeliveryProgress(placedAt, 10, at(1)).stage).toBe('packed')
+    expect(quickDeliveryProgress(placedAt, 10, at(2.5))).toMatchObject({ stage: 'out-for-delivery', minutesLeft: 8 })
+    expect(quickDeliveryProgress(placedAt, 10, at(9.5))).toMatchObject({ stage: 'out-for-delivery', minutesLeft: 1 })
+    expect(quickDeliveryProgress(placedAt, 10, at(10))).toEqual({ stage: 'delivered', minutesLeft: 0, fraction: 1, delayed: false })
   })
 
-  it('is on the way from 20% until the ETA, counting minutes down (rounded up)', () => {
-    expect(quickDeliveryProgress(placedAt, 10, at(2))).toMatchObject({ stage: 'on-the-way', minutesLeft: 8 })
-    expect(quickDeliveryProgress(placedAt, 10, at(9.5))).toMatchObject({ stage: 'on-the-way', minutesLeft: 1 })
+  it('a delay pushes the ETA back without moving the stage backwards', () => {
+    const late = quickDeliveryProgress(placedAt, 10, at(9), 10)
+    expect(late).toMatchObject({ stage: 'out-for-delivery', minutesLeft: 11, delayed: true })
+    expect(quickDeliveryProgress(placedAt, 10, at(3), 10).stage).toBe('out-for-delivery')
+    expect(quickDeliveryProgress(placedAt, 10, at(20), 10)).toMatchObject({ stage: 'delivered', delayed: false })
   })
 
-  it('is delivered at and after the ETA, never past 100%', () => {
-    expect(quickDeliveryProgress(placedAt, 10, at(10))).toEqual({ stage: 'delivered', minutesLeft: 0, fraction: 1 })
+  it('never passes 100%, and treats a clock behind the order time as just placed', () => {
     expect(quickDeliveryProgress(placedAt, 10, at(60)).fraction).toBe(1)
+    expect(quickDeliveryProgress(placedAt, 10, at(-1))).toMatchObject({ stage: 'confirmed', minutesLeft: 10 })
   })
+})
 
-  it('treats a clock slightly behind the order time as just placed', () => {
-    expect(quickDeliveryProgress(placedAt, 10, at(-1))).toEqual({ stage: 'packing', minutesLeft: 10, fraction: 0 })
+describe('isOrderDelivered', () => {
+  const store = { id: 'ds-hsr', name: '', area: '', city: '', avgDeliveryMinutes: 10, pincodes: [] }
+  const placedAt = '2026-10-27T12:00:00+05:30'
+  const at = (minutes: number) => new Date(Date.parse(placedAt) + minutes * 60_000)
+  const order = (items: OrderItem[], status: Order['status'] = 'placed') => ({ items, placedAt, status }) as Order
+
+  it('needs every Blinkit shipment delivered, and the seller part too', () => {
+    expect(isOrderDelivered(order([item('a', 'ds-hsr')]), [store], at(9))).toBe(false)
+    expect(isOrderDelivered(order([item('a', 'ds-hsr')]), [store], at(10))).toBe(true)
+    expect(isOrderDelivered(order([item('a', 'ds-hsr')]), [store], at(10), 5)).toBe(false)
+    expect(isOrderDelivered(order([item('a', 'ds-hsr'), item('b')]), [store], at(60))).toBe(false)
+    expect(isOrderDelivered(order([item('b')], 'delivered'), [store], at(0))).toBe(true)
   })
 })

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router'
 import { useRole } from '../../context/useRole'
+import { useCashbackCrediting } from '../../hooks/useCashbackCrediting'
 import DemoPanel from './DemoPanel'
 import Header from './Header'
 import RolePicker from './RolePicker'
@@ -16,6 +17,7 @@ import RolePicker from './RolePicker'
 export default function Layout() {
   const { pathname } = useLocation()
   const { role } = useRole()
+  useCashbackCrediting()
 
   // A new page starts at the top (e.g. clicking a related product further down).
   // Keyed on pathname only, so changing filters in the query string doesn't jump.

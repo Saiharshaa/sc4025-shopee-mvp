@@ -1,9 +1,11 @@
 import { Link } from 'react-router'
+import { useDemo } from '../../context/useDemo'
+import { useNow } from '../../hooks/useNow'
 import { formatDateTime, formatRupees } from '../../lib/format'
-import { ORDER_STATUS_LABELS, quickDeliveryProgress, splitShipments } from '../../lib/tracking'
+import { ORDER_STATUS_LABELS, QUICK_STAGE_LABELS, quickDeliveryProgress, splitShipments } from '../../lib/tracking'
 import { getDarkStores, getOrders } from '../../mocks'
 import type { Order } from '../../types'
-import { useNow } from './useNow'
+import { useMockData } from '../../hooks/useMockData'
 
 /**
  * Route:  /orders
@@ -11,10 +13,10 @@ import { useNow } from './useNow'
  * Scope:  Every order, newest first, each linking to its tracking page.
  */
 
-const QUICK_LABELS = { packing: 'Packing', 'on-the-way': 'On the way', delivered: 'Delivered' }
-
 export default function OrdersPage() {
+  useMockData()
   const now = useNow(15_000)
+  const { demo } = useDemo()
   const orders = getOrders()
   const stores = getDarkStores()
 
@@ -22,7 +24,9 @@ export default function OrdersPage() {
   function statusLabel(order: Order): string {
     const [only, ...others] = splitShipments(order)
     const store = others.length === 0 && only?.kind === 'blinkit' ? stores.find((s) => s.id === only.darkStoreId) : undefined
-    return store ? QUICK_LABELS[quickDeliveryProgress(order.placedAt, store.avgDeliveryMinutes, now).stage] : ORDER_STATUS_LABELS[order.status]
+    if (!store) return ORDER_STATUS_LABELS[order.status]
+    const progress = quickDeliveryProgress(order.placedAt, store.avgDeliveryMinutes, now, demo.delayMinutes)
+    return `${QUICK_STAGE_LABELS[progress.stage]}${progress.delayed ? ' · running late' : ''}`
   }
 
   return (

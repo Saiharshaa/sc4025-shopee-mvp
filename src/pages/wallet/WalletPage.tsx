@@ -2,28 +2,56 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { formatDate, formatDateTime, formatRupees } from '../../lib/format'
 import { DEFAULT_PRICING_RULES, isVoucherExpired } from '../../lib/pricing'
-import { getCoinBalance, getOrders, getVouchers } from '../../mocks'
+import { COIN_EXPIRY_MONTHS, coinsExpireAt, nextReward } from '../../lib/rewards'
+import { getCashbackCreditedAt, getCoinBalance, getInitialCoinsExpiry, getOrders, getVouchers } from '../../mocks'
 import type { Voucher } from '../../types'
+import { useMockData } from '../../hooks/useMockData'
 
 /**
  * Route:  /wallet
  * OWNER:  Person 4 (Tech Lead)
  * Scope:  The "Rewards" stage: Shopee Coins balance, how Coins are earned
- *         (ShopeePay cashback, rule 9) and spent (rule 6), Coins activity
- *         from orders, and vouchers (available and expired).
+ *         (ShopeePay cashback, rule 9) and spent (rule 6), Coins pending
+ *         until delivery, expiry dates, the next-reward nudge (US9, rules in
+ *         src/lib/rewards.ts), Coins activity and vouchers.
  */
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const { shopeePayCashbackPercent, maxCashbackCoins, coinCapPercent } = DEFAULT_PRICING_RULES
 
 export default function WalletPage() {
+  useMockData()
   const [now] = useState(() => new Date())
   const balance = getCoinBalance()
+  const reward = nextReward(balance)
+  const orders = getOrders()
+  const pendingCoins = orders
+    .filter((o) => o.pricing.coinsEarned > 0 && !getCashbackCreditedAt(o.id))
+    .reduce((sum, o) => sum + o.pricing.coinsEarned, 0)
 
-  const activity = getOrders().flatMap((o) => [
-    ...(o.pricing.coinsEarned > 0 ? [{ key: `${o.id}-in`, orderId: o.id, at: o.placedAt, coins: o.pricing.coinsEarned, label: 'ShopeePay cashback' }] : []),
-    ...(o.pricing.coinsUsed > 0 ? [{ key: `${o.id}-out`, orderId: o.id, at: o.placedAt, coins: -o.pricing.coinsUsed, label: 'Used at checkout' }] : []),
-  ])
+  const activity = orders.flatMap((o) => {
+    const credited = getCashbackCreditedAt(o.id)
+    return [
+      ...(o.pricing.coinsEarned > 0
+        ? [
+            {
+              key: `${o.id}-in`,
+              orderId: o.id,
+              at: o.placedAt,
+              coins: o.pricing.coinsEarned,
+              label: 'ShopeePay cashback',
+              detail: credited
+                ? `credited ${formatDate(credited)} · expires ${formatDate(coinsExpireAt(credited))}`
+                : 'pending · credited after delivery',
+              pending: !credited,
+            },
+          ]
+        : []),
+      ...(o.pricing.coinsUsed > 0
+        ? [{ key: `${o.id}-out`, orderId: o.id, at: o.placedAt, coins: -o.pricing.coinsUsed, label: 'Used at checkout', detail: '', pending: false }]
+        : []),
+    ]
+  })
 
   const vouchers = getVouchers().sort((a, b) => Date.parse(a.expiresAt) - Date.parse(b.expiresAt))
   const available = vouchers.filter((v) => !isVoucherExpired(v, now))
@@ -31,7 +59,7 @@ export default function WalletPage() {
 
   return (
     <section>
-      <h1 className="text-2xl font-bold">Wallet</h1>
+      <h1 className="text-2xl font-bold">Rewards</h1>
 
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr]">
         <div className="rounded-lg bg-linear-to-br from-brand to-brand-dark p-5 text-white">
@@ -40,6 +68,27 @@ export default function WalletPage() {
             <span aria-hidden="true">🪙</span> {balance}
           </p>
           <p className="mt-1 text-sm opacity-90">Worth {formatRupees(balance)} off your next orders · 1 Coin = ₹1</p>
+          {pendingCoins > 0 && (
+            <p className="mt-1 text-sm">+{pendingCoins} pending, credited when your orders are delivered</p>
+          )}
+
+          {/* US9 next-reward nudge (goal-gradient): the next goal shows as soon as one is reached. */}
+          <div className="mt-3 rounded bg-white/15 p-2 text-sm">
+            <p>
+              <strong>{reward.remaining} Coins</strong> to {formatRupees(reward.target)} off
+            </p>
+            <div
+              role="progressbar"
+              aria-label="Progress to your next reward"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(reward.fraction * 100)}
+              className="mt-1 h-1.5 overflow-hidden rounded-full bg-white/30"
+            >
+              <div className="h-full rounded-full bg-white" style={{ width: `${reward.fraction * 100}%` }} />
+            </div>
+          </div>
+          <p className="mt-2 text-xs opacity-90">Earlier Coins expire {formatDate(getInitialCoinsExpiry())}</p>
           <Link to="/products?blinkit=1" className="mt-4 inline-block rounded bg-white px-3 py-1.5 text-sm font-semibold text-brand">
             Shop Global Picks
           </Link>
@@ -55,6 +104,9 @@ export default function WalletPage() {
             <li>
               <strong>Spend</strong>: tick "Use Shopee Coins" at checkout to cover up to {coinCapPercent}% of an order after
               vouchers.
+            </li>
+            <li>
+              <strong>When</strong>: Coins land here once the order is delivered and last {COIN_EXPIRY_MONTHS} months.
             </li>
             <li>
               <strong>Stack</strong>: Coins work alongside one voucher per order.
@@ -84,8 +136,11 @@ export default function WalletPage() {
                     </Link>{' '}
                     · {formatDateTime(a.at)}
                   </span>
+                  {a.detail && <span className="block text-xs text-gray-500">{a.detail}</span>}
                 </span>
-                <span className={`flex-none font-semibold ${a.coins > 0 ? 'text-green-700' : 'text-gray-700'}`}>
+                <span
+                  className={`flex-none font-semibold ${a.pending ? 'text-gray-400' : a.coins > 0 ? 'text-green-700' : 'text-gray-700'}`}
+                >
                   {a.coins > 0 ? `+${a.coins}` : `−${-a.coins}`}
                 </span>
               </li>

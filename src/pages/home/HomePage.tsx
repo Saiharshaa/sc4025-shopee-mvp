@@ -5,6 +5,7 @@ import { discountPercent } from '../../lib/catalogue'
 import { formatDate, formatRupees } from '../../lib/format'
 import { DEFAULT_PRICING_RULES, isVoucherExpired } from '../../lib/pricing'
 import { getBlinkitAvailability, getCategories, getCoinBalance, getDarkStoreForPincode, getProducts, getUser, getVouchers } from '../../mocks'
+import { useMockData } from '../../hooks/useMockData'
 import Shelf from './Shelf'
 
 /**
@@ -15,6 +16,7 @@ import Shelf from './Shelf'
  *         and a Coins teaser. Every tile deep-links into a filtered /products.
  */
 export default function HomePage() {
+  useMockData()
   const navigate = useNavigate()
   const store = getDarkStoreForPincode(getUser().defaultAddress.pincode)
   const coins = getCoinBalance()

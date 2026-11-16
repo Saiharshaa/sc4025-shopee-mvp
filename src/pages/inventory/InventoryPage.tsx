@@ -1,6 +1,7 @@
 import { useRef, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import { getDarkStores, getStockRecords, getVendors } from '../../mocks'
+import { useMockData } from '../../hooks/useMockData'
 import DarkStoreTab from './DarkStoreTab'
 import VendorTab from './VendorTab'
 
@@ -20,6 +21,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id']
 
 export default function InventoryPage() {
+  useMockData()
   const [params, setParams] = useSearchParams()
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
   const active: TabId = params.get('tab') === 'stores' ? 'stores' : 'vendors'
