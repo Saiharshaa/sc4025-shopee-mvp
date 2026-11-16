@@ -8,7 +8,7 @@ import { useDemo } from '../../context/useDemo'
 export default function DemoPanel() {
   const { demo, setDemo } = useDemo()
   const [open, setOpen] = useState(false)
-  const active = demo.failNextPayment
+  const active = demo.failNextPayment || demo.delayMinutes > 0
 
   return (
     <div className="fixed bottom-16 left-3 z-30 sm:bottom-4">
@@ -26,6 +26,18 @@ export default function DemoPanel() {
             <span>
               Make the next payment fail
               <span className="block text-xs text-gray-500">ShopeePay or UPI. Switches off after one failure.</span>
+            </span>
+          </label>
+          <label className="mt-3 flex items-start gap-2">
+            <input
+              type="checkbox"
+              className="mt-0.5 accent-brand"
+              checked={demo.delayMinutes > 0}
+              onChange={(e) => setDemo({ delayMinutes: e.target.checked ? 10 : 0 })}
+            />
+            <span>
+              Delay Blinkit deliveries by 10 min
+              <span className="block text-xs text-gray-500">Order tracking shows the new ETA and a running-late notice.</span>
             </span>
           </label>
         </div>

@@ -47,7 +47,7 @@ export default function PayConfirmSheet({ open, processing, amount, coinsEarned,
         </p>
         {coinsEarned > 0 && (
           <p className="mt-3 rounded bg-brand-light p-2 text-sm text-brand-dark">
-            🪙 You'll earn <strong>{coinsEarned} Shopee Coins</strong> on this order
+            🪙 You'll earn <strong>{coinsEarned} Shopee Coins</strong>, credited once it's delivered
           </p>
         )}
         <p className="mt-3 text-xs text-gray-500">This is the full amount. Nothing is added after you confirm.</p>

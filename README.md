@@ -311,9 +311,9 @@ The team agreed these rules on 2026-10-14:
    payable total back as Coins, rounded down, max 100 per order**. Other UPI
    apps and COD earn none. It's on what the shopper actually pays, so coins
    spent never earn coins, and it never changes the total. Use
-   `calculateCashback(total, method)`. In the prototype the Coins land in the
-   balance as soon as the order is placed; a live system would credit them
-   after delivery.
+   `calculateCashback(total, method)`. The Coins are **credited once the order
+   is delivered** (US9) and expire 6 months later (`src/lib/rewards.ts`); a
+   background tick in the layout credits them as simulated deliveries finish.
 
 **Checkout defaults:** checkout opens with `bestVoucher(cart, vouchers)`
 selected (the voucher giving the lowest total before coins, shipping

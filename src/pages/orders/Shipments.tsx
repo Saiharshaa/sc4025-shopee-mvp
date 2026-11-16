@@ -1,23 +1,36 @@
 import { formatDate, formatDateTime } from '../../lib/format'
-import { ORDER_STATUS_LABELS, quickDeliveryProgress, type QuickDeliveryStage } from '../../lib/tracking'
+import { ORDER_STATUS_LABELS, QUICK_STAGE_LABELS, quickDeliveryProgress, type QuickDeliveryStage } from '../../lib/tracking'
 import type { DarkStore, Order, OrderItem } from '../../types'
 import OrderItems from './OrderItems'
 
 /** OWNER: Person 4 (Tech Lead). One card per shipment on the tracking page. */
 
-const STAGES: { id: QuickDeliveryStage; label: string }[] = [
-  { id: 'packing', label: 'Packing' },
-  { id: 'on-the-way', label: 'On the way' },
-  { id: 'delivered', label: 'Delivered' },
-]
+// US8: the four stages, in order.
+const STAGES: QuickDeliveryStage[] = ['confirmed', 'packed', 'out-for-delivery', 'delivered']
 
-export function BlinkitShipment({ order, store, items, now }: { order: Order; store: DarkStore; items: OrderItem[]; now: Date }) {
-  const progress = quickDeliveryProgress(order.placedAt, store.avgDeliveryMinutes, now)
-  const current = STAGES.findIndex((s) => s.id === progress.stage)
+const HEADLINES: Record<QuickDeliveryStage, string> = {
+  confirmed: 'Order confirmed',
+  packed: 'Packed at the store',
+  'out-for-delivery': 'Out for delivery',
+  delivered: 'Delivered',
+}
+
+interface BlinkitProps {
+  order: Order
+  store: DarkStore
+  items: OrderItem[]
+  now: Date
+  /** Demo delay in minutes (0 = on time). */
+  delayMinutes: number
+}
+
+export function BlinkitShipment({ order, store, items, now, delayMinutes }: BlinkitProps) {
+  const progress = quickDeliveryProgress(order.placedAt, store.avgDeliveryMinutes, now, delayMinutes)
+  const current = STAGES.indexOf(progress.stage)
   const headline =
     progress.stage === 'delivered'
-      ? 'Delivered'
-      : `${progress.stage === 'packing' ? 'Packing your order' : 'On the way'} · arriving in ~${progress.minutesLeft} min`
+      ? HEADLINES.delivered
+      : `${HEADLINES[progress.stage]} · arriving in ~${progress.minutesLeft} min`
 
   return (
     <article aria-labelledby={`ship-${store.id}`} className="rounded-lg bg-white p-4 shadow-sm">
@@ -27,6 +40,11 @@ export function BlinkitShipment({ order, store, items, now }: { order: Order; st
       <p className="mt-1 text-lg font-bold" aria-live="polite">
         {headline}
       </p>
+      {progress.delayed && (
+        <p role="alert" className="mt-2 rounded bg-amber-50 p-2 text-sm text-amber-900">
+          ⏱ Running about {delayMinutes} min late. Your rider is held up; the ETA above is updated.
+        </p>
+      )}
       <div
         role="progressbar"
         aria-label="Delivery progress"
@@ -35,12 +53,12 @@ export function BlinkitShipment({ order, store, items, now }: { order: Order; st
         aria-valuenow={Math.round(progress.fraction * 100)}
         className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100"
       >
-        <div className="h-full rounded-full bg-yellow-400 transition-all" style={{ width: `${progress.fraction * 100}%` }} />
+        <div className={`h-full rounded-full transition-all ${progress.delayed ? 'bg-amber-500' : 'bg-yellow-400'}`} style={{ width: `${progress.fraction * 100}%` }} />
       </div>
-      <ol className="mt-2 flex justify-between text-xs">
+      <ol className="mt-2 flex justify-between gap-1 text-xs">
         {STAGES.map((s, i) => (
-          <li key={s.id} className={i <= current ? 'font-semibold text-gray-900' : 'text-gray-400'}>
-            {s.label}
+          <li key={s} className={i <= current ? 'font-semibold text-gray-900' : 'text-gray-400'}>
+            {QUICK_STAGE_LABELS[s]}
           </li>
         ))}
       </ol>

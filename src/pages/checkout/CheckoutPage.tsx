@@ -6,6 +6,7 @@ import { formatRupees } from '../../lib/format'
 import { bestVoucher, calculateCashback, calculateOrderTotal, isVoucherExpired } from '../../lib/pricing'
 import { getCoinBalance, getUser, getVouchers, placeOrder } from '../../mocks'
 import type { PaymentMethod } from '../../types'
+import { useMockData } from '../../hooks/useMockData'
 import PayConfirmSheet from './PayConfirmSheet'
 import PaymentMethodPicker from './PaymentMethodPicker'
 import PriceBreakdown from './PriceBreakdown'
@@ -21,6 +22,7 @@ import VoucherPicker from './VoucherPicker'
  *         the breakdown.
  */
 export default function CheckoutPage() {
+  useMockData()
   const { cart, clearCart } = useCart()
   const navigate = useNavigate()
   const [voucherCode, setVoucherCode] = useState<string | null>(
@@ -188,7 +190,7 @@ export default function CheckoutPage() {
           {coinsEarned > 0 ? (
             <p className="mt-3 rounded bg-brand-light p-2 text-sm text-brand-dark">
               You'll earn <strong>{coinsEarned} Shopee Coins</strong> with ShopeePay, worth {formatRupees(coinsEarned)} off
-              a future order.
+              a future order. They land in Rewards once it's delivered.
             </p>
           ) : (
             shopeePayCoins > 0 && (
