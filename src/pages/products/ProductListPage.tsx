@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router'
 import ProductCard from '../../components/ui/ProductCard'
 import { filterProducts, sortProducts } from '../../lib/catalogue'
@@ -29,6 +29,7 @@ const TOGGLES = [
 
 export default function ProductListPage() {
   const [params, setParams] = useSearchParams()
+  const [requested, setRequested] = useState<string | null>(null)
   const categories = getCategories()
 
   const query = params.get('q') ?? ''
@@ -128,8 +129,27 @@ export default function ProductListPage() {
       ) : (
         <div className="mt-6 rounded-lg bg-white p-8 text-center shadow-sm">
           <p className="font-medium">No products match.</p>
+          {/* US10: a search with no match can become a product request. */}
+          {query.trim() &&
+            (requested === query.trim() ? (
+              <p role="status" className="mt-3 text-sm text-green-700">
+                Thanks! We've noted “{requested}” and will let you know if Global Picks starts stocking it.
+              </p>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setRequested(query.trim())}
+                className="mt-3 rounded bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark"
+              >
+                Request “{query.trim()}”
+              </button>
+            ))}
           {filtersActive && (
-            <button type="button" onClick={() => setParams({}, { replace: true })} className="mt-3 text-brand underline">
+            <button
+              type="button"
+              onClick={() => setParams({}, { replace: true })}
+              className="mt-3 block w-full text-sm text-brand underline"
+            >
               Clear search and filters
             </button>
           )}

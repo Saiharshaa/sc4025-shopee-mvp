@@ -23,7 +23,8 @@ export default function HomePage() {
   const trending = products
     .map((p) => ({ product: p, availability: getBlinkitAvailability(p.id) }))
     .filter((x) => x.availability)
-    .sort((a, b) => b.product.rating - a.product.rating)
+    // In stock nearby first, then by rating; out-of-stock picks stay visible and are marked (US1).
+    .sort((a, b) => Number(b.availability!.units > 0) - Number(a.availability!.units > 0) || b.product.rating - a.product.rating)
   const deals = products
     .filter((p) => discountPercent(p) > 0)
     .sort((a, b) => discountPercent(b) - discountPercent(a))
