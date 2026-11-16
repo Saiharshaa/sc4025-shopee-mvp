@@ -1,15 +1,15 @@
 import type { User } from '../../types'
 
 // Do not import this file directly — use the accessors in src/mocks/index.ts.
-// Fictional demo shopper.
+// Fictional demo shopper: Rashmi, the primary persona in the report (Section 1.5).
 
 export const USER: User = {
   id: 'u001',
-  name: 'Priya Sharma',
-  email: 'priya.sharma@example.com',
+  name: 'Rashmi Rao',
+  email: 'rashmi.rao@example.com',
   phone: '+91 90000 12345',
   defaultAddress: {
-    recipient: 'Priya Sharma',
+    recipient: 'Rashmi Rao',
     phone: '+91 90000 12345',
     line1: 'Flat 302, Lakeview Residency',
     line2: '27th Main Road, HSR Layout Sector 2',
