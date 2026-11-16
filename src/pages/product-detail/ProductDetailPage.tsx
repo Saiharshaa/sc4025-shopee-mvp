@@ -17,6 +17,7 @@ import {
   getVendorById,
 } from '../../mocks'
 import type { Product } from '../../types'
+import ProductTabs from './ProductTabs'
 import TrustPanel from './TrustPanel'
 
 /**
@@ -50,6 +51,7 @@ function ProductDetail({ product }: { product: Product }) {
   const { cart, addItem } = useCart()
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState<number | null>(null)
+  const [notify, setNotify] = useState(false)
 
   const availability = getBlinkitAvailability(product.id)
   const vendorId = getStockForProduct(product.id)[0]?.vendorId
@@ -167,12 +169,40 @@ function ProductDetail({ product }: { product: Product }) {
                 Buy now
               </button>
             </div>
-          ) : (
+          ) : inCart > 0 ? (
             <p className="rounded bg-gray-100 p-3 text-sm text-gray-700">
-              {inCart > 0
-                ? `All ${inCart} available near you are already in your cart.`
-                : `Out of stock at ${availability?.store.name ?? 'your nearest store'} right now.`}
+              All {inCart} available near you are already in your cart.
             </p>
+          ) : (
+            // US3: out of stock nearby -> Add to cart disabled, "Notify me" offered. No switch to slower delivery.
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-red-700">
+                Out of stock at {availability?.store.name ?? 'your nearest store'}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  disabled
+                  className="cursor-not-allowed rounded border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-400"
+                >
+                  Add to cart
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={notify}
+                  onClick={() => setNotify(true)}
+                  disabled={notify}
+                  className="rounded bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark disabled:bg-green-700"
+                >
+                  {notify ? "✓ We'll notify you" : 'Notify me'}
+                </button>
+              </div>
+              {notify && (
+                <p role="status" className="text-sm text-green-700">
+                  We'll let you know as soon as {availability?.store.name} has it again.
+                </p>
+              )}
+            </div>
           )}
 
           <p role="status" className="min-h-5 text-sm text-green-700">
@@ -188,12 +218,7 @@ function ProductDetail({ product }: { product: Product }) {
         </div>
       </section>
 
-      <section aria-labelledby="about" className="mt-4 rounded-lg bg-white p-4 shadow-sm">
-        <h2 id="about" className="font-semibold">
-          About this product
-        </h2>
-        <p className="mt-1 text-sm text-gray-700">{product.description}</p>
-      </section>
+      <ProductTabs product={product} vendor={vendor} availability={availability} />
 
       {related.length > 0 && (
         <section aria-labelledby="related" className="mt-6">
@@ -228,6 +253,16 @@ function DeliveryPromise({
     d.setDate(d.getDate() + product.etaDays)
     return d
   })
+
+  // Out of stock nearby: say so. We never fall back to a slower delivery for a Global Pick.
+  if (availability && availability.units === 0) {
+    return (
+      <div className="rounded-lg bg-gray-100 p-3 text-sm">
+        <p className="font-semibold">Not available for delivery right now</p>
+        <p className="text-gray-600">To {area} · usually ~{availability.store.avgDeliveryMinutes} min from {availability.store.name}</p>
+      </div>
+    )
+  }
 
   if (availability && availability.units > 0) {
     return (
