@@ -78,12 +78,6 @@ live ETA, Rewards milestones, partner dashboard with days of inventory.
 
 ## Team & ownership
 
-> Fill in names and GitHub handles in the first table.
-
-Pages were first assigned one per role (last column). Every page has since
-been built by Person 4; the commit history shows who wrote each one. The
-ownership rules below still apply if a teammate takes a page on.
-
 | Person   | Role                 | Name / GitHub | Page originally assigned                              |
 | -------- | -------------------- | ------------- | ----------------------------------------------------- |
 | Person 1 | PM                   | _add_         | Home + deals feed                                     |
@@ -133,9 +127,6 @@ merge conflicts close to zero, and the commit history shows who built what.
 ---
 
 ## Git workflow
-
-Our lecturer reads the commit history to check how work was shared out.
-Following these steps keeps your work credited to you.
 
 ### One-time setup (each person)
 
