@@ -18,15 +18,15 @@ npm install
 npm run dev          # http://localhost:5173
 ```
 
-| Command              | What it does                                     |
-| -------------------- | ------------------------------------------------ |
-| `npm run dev`        | Dev server with hot reload                       |
-| `npm test`           | Run unit tests once (Vitest)                     |
-| `npm run test:watch` | Re-run tests on save                             |
-| `npm run build`      | Type-check + production build into `dist/`       |
-| `npm run lint`       | Lint with oxlint                                 |
-| `npm run typecheck`  | Type-check only                                  |
-| `npm run preview`    | Serve the production build locally               |
+| Command              | What it does                               |
+| -------------------- | ------------------------------------------ |
+| `npm run dev`        | Dev server with hot reload                 |
+| `npm test`           | Run unit tests once (Vitest)               |
+| `npm run test:watch` | Re-run tests on save                       |
+| `npm run build`      | Type-check + production build into `dist/` |
+| `npm run lint`       | Lint with oxlint                           |
+| `npm run typecheck`  | Type-check only                            |
+| `npm run preview`    | Serve the production build locally         |
 
 **Before opening a PR, run:** `npm run build && npm test && npm run lint`
 
@@ -54,13 +54,25 @@ repo is private. So:
   header. There's no sign-in; a reload starts a fresh session.
 - **⚙ Demo controls** (bottom-left, shoppers only) switch on unhappy paths for
   usability tests and the video:
-  - *Make the next payment fail*: ShopeePay/UPI is declined once; checkout
+  - _Make the next payment fail_: ShopeePay/UPI is declined once; checkout
     keeps the cart, voucher and Coins (US7).
-  - *Delay Blinkit deliveries by 10 min*: tracking shows the new ETA and a
+  - _Delay Blinkit deliveries by 10 min_: tracking shows the new ETA and a
     running-late notice (US8).
 - **Timing:** a Blinkit order goes Confirmed → Packed → Out for delivery →
   Delivered over the store's average time (~11 min at HSR Layout), and its
   ShopeePay Coins are credited when it's delivered (US9).
+
+## Design
+
+**v2 – matches the current build (Nov 2026)**
+![Wireframes v2](docs/wireframes/wireframes-v2.png)
+
+**v1 – first lo-fi pass (Oct 2026)**
+![Wireframes v1](docs/wireframes/wireframes-v1.png)
+
+Changes from v1 to v2: role picker, bottom tabs, Seller & stock tab,
+"How we check" sheet, free-shipping progress bar, pay confirmation,
+live ETA, Rewards milestones, partner dashboard with days of inventory.
 
 ---
 
@@ -72,46 +84,46 @@ Pages were first assigned one per role (last column). Every page has since
 been built by Person 4; the commit history shows who wrote each one. The
 ownership rules below still apply if a teammate takes a page on.
 
-| Person   | Role                | Name / GitHub   | Page originally assigned                |
-| -------- | ------------------- | --------------- | --------------------------------------- |
-| Person 1 | PM                  | _add_           | Home + deals feed                       |
-| Person 2 | Analyst             | _add_           | Listing, search, filters                |
-| Person 3 | Designer            | _add_           | Product detail page, design system      |
-| Person 4 | Engineer / Tech Lead | @Saiharshaa    | Cart, checkout, pricing engine, shared infrastructure |
-| Person 5 | GTM                 | _add_           | Wallet (coins + vouchers), order tracking |
+| Person   | Role                 | Name / GitHub | Page originally assigned                              |
+| -------- | -------------------- | ------------- | ----------------------------------------------------- |
+| Person 1 | PM                   | _add_         | Home + deals feed                                     |
+| Person 2 | Analyst              | _add_         | Listing, search, filters                              |
+| Person 3 | Designer             | @Faith-Yeo    | Product detail page, design system                    |
+| Person 4 | Engineer / Tech Lead | @Saiharshaa   | Cart, checkout, pricing engine, shared infrastructure |
+| Person 5 | GTM                  | _add_         | Wallet (coins + vouchers), order tracking             |
 
 ### Routes
 
-| Route          | Page                     | Folder                      | Built by             |
-| -------------- | ------------------------ | --------------------------- | -------------------- |
-| `/`            | Home: Global Picks hero, trending shelf, deals | `src/pages/home/` | Person 4 (Tech Lead) |
-| `/products`    | Listing, search, filters | `src/pages/products/`       | Person 4 (Tech Lead) |
-| `/product/:id` | Product detail, trust panel, add to cart | `src/pages/product-detail/` | Person 4 (Tech Lead) |
-| `/cart`        | Cart                     | `src/pages/cart/`           | Person 4 (Tech Lead) |
-| `/checkout`    | Checkout, ShopeePay      | `src/pages/checkout/`       | Person 4 (Tech Lead) |
-| `/wallet`      | Rewards: Coins, pending, expiry, nudge, vouchers | `src/pages/wallet/` | Person 4 (Tech Lead) |
-| `/orders`      | All orders               | `src/pages/orders/`         | Person 4 (Tech Lead) |
-| `/orders/:id`  | Live order tracking      | `src/pages/orders/`         | Person 4 (Tech Lead) |
-| `/inventory`   | Importer dashboard (partner role only) | `src/pages/inventory/` | Person 4 (Tech Lead) |
+| Route          | Page                                             | Folder                      | Built by             |
+| -------------- | ------------------------------------------------ | --------------------------- | -------------------- |
+| `/`            | Home: Global Picks hero, trending shelf, deals   | `src/pages/home/`           | Person 4 (Tech Lead) |
+| `/products`    | Listing, search, filters                         | `src/pages/products/`       | Person 4 (Tech Lead) |
+| `/product/:id` | Product detail, trust panel, add to cart         | `src/pages/product-detail/` | Person 4 (Tech Lead) |
+| `/cart`        | Cart                                             | `src/pages/cart/`           | Person 4 (Tech Lead) |
+| `/checkout`    | Checkout, ShopeePay                              | `src/pages/checkout/`       | Person 4 (Tech Lead) |
+| `/wallet`      | Rewards: Coins, pending, expiry, nudge, vouchers | `src/pages/wallet/`         | Person 4 (Tech Lead) |
+| `/orders`      | All orders                                       | `src/pages/orders/`         | Person 4 (Tech Lead) |
+| `/orders/:id`  | Live order tracking                              | `src/pages/orders/`         | Person 4 (Tech Lead) |
+| `/inventory`   | Importer dashboard (partner role only)           | `src/pages/inventory/`      | Person 4 (Tech Lead) |
 
 ### Shared files
 
-| Path                                  | What                                   | Owner                |
-| ------------------------------------- | -------------------------------------- | -------------------- |
-| `src/types/index.ts`                  | Every shared type                      | Person 4 (Tech Lead) |
-| `src/mocks/`                          | Mock data + accessor functions         | Person 4 (Tech Lead) |
-| `src/lib/pricing.ts` (+ tests)        | Voucher / coin / shipping engine       | Person 4 (Tech Lead) |
-| `src/lib/inventory.ts` (+ tests)      | Days of inventory, low stock (< 7 days), registration renewal | Person 4 (Tech Lead) |
-| `src/lib/rewards.ts` (+ tests)        | Coins expiry, next-reward nudge        | Person 4 (Tech Lead) |
-| `src/hooks/`                          | `useNow`, `useMockData`, cashback crediting job | Person 4 (Tech Lead) |
-| `src/lib/catalogue.ts` (+ tests)      | Search, filters, sorting, deal %, delivery labels | Person 4 (Tech Lead) |
-| `src/lib/tracking.ts` (+ tests)       | Shipments + live Blinkit delivery progress | Person 4 (Tech Lead) |
-| `src/lib/format.ts`                   | `formatRupees`, `formatDate`, `formatDateTime` | Person 4 (Tech Lead) |
-| `src/context/`                        | Cart state (`useCart`)                 | Person 4 (Tech Lead) |
-| `src/App.tsx`, `src/main.tsx`         | Route table, providers                 | Person 4 (Tech Lead) |
-| `src/components/layout/`              | Header, nav, page shell                | Person 4 (Person 3 may restyle) |
-| `src/components/ui/`                  | Shared UI (`ProductCard`)              | Person 4 (Person 3 may restyle) |
-| `@theme` in `src/index.css`           | Colour tokens                          | Person 3 (Designer)  |
+| Path                             | What                                                          | Owner                           |
+| -------------------------------- | ------------------------------------------------------------- | ------------------------------- |
+| `src/types/index.ts`             | Every shared type                                             | Person 4 (Tech Lead)            |
+| `src/mocks/`                     | Mock data + accessor functions                                | Person 4 (Tech Lead)            |
+| `src/lib/pricing.ts` (+ tests)   | Voucher / coin / shipping engine                              | Person 4 (Tech Lead)            |
+| `src/lib/inventory.ts` (+ tests) | Days of inventory, low stock (< 7 days), registration renewal | Person 4 (Tech Lead)            |
+| `src/lib/rewards.ts` (+ tests)   | Coins expiry, next-reward nudge                               | Person 4 (Tech Lead)            |
+| `src/hooks/`                     | `useNow`, `useMockData`, cashback crediting job               | Person 4 (Tech Lead)            |
+| `src/lib/catalogue.ts` (+ tests) | Search, filters, sorting, deal %, delivery labels             | Person 4 (Tech Lead)            |
+| `src/lib/tracking.ts` (+ tests)  | Shipments + live Blinkit delivery progress                    | Person 4 (Tech Lead)            |
+| `src/lib/format.ts`              | `formatRupees`, `formatDate`, `formatDateTime`                | Person 4 (Tech Lead)            |
+| `src/context/`                   | Cart state (`useCart`)                                        | Person 4 (Tech Lead)            |
+| `src/App.tsx`, `src/main.tsx`    | Route table, providers                                        | Person 4 (Tech Lead)            |
+| `src/components/layout/`         | Header, nav, page shell                                       | Person 4 (Person 3 may restyle) |
+| `src/components/ui/`             | Shared UI (`ProductCard`)                                     | Person 4 (Person 3 may restyle) |
+| `@theme` in `src/index.css`      | Colour tokens                                                 | Person 3 (Designer)             |
 
 **Rule: only edit files you own.** If you need something changed in a shared
 file (a new field on `Product`, a new route, a new accessor), message
@@ -190,24 +202,24 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
 2. **Get data from `src/mocks` only.** Never import from `src/mocks/data/*`.
    These accessors are the swap point if the data source ever changes:
 
-   | Accessor                  | Returns                                               |
-   | ------------------------- | ----------------------------------------------------- |
-   | `getProducts()`           | All 30 products (fresh array, safe to sort/filter)    |
-   | `getProductById(id)`      | One product, or `undefined`                           |
-   | `getCategories()`         | `{ id, label }[]` for the 6 categories                |
-   | `getVouchers()`           | All vouchers, including expired ones                  |
-   | `getVoucherByCode(code)`  | One voucher (case-insensitive), or `undefined`        |
-   | `getCoinBalance()`        | Current Shopee Coins balance                          |
-   | `getUser()`               | Demo shopper with default address                     |
-   | `getOrders()`             | Orders, newest first                                  |
-   | `getOrderById(id)`        | One order, or `undefined`                             |
-   | `getVendors()` / `getVendorById(id)` | Brand-authorised importers (Global Picks)  |
-   | `getDarkStores()`         | Blinkit dark stores in the pilot city                 |
-   | `getStockRecords()`       | Every stock line: product × dark store, with units    |
-   | `getStockForProduct(id)`  | One product's stock per dark store (`[]` if not at Blinkit) |
-   | `getDarkStoreForPincode(pin)` | The dark store delivering to a pincode, or `undefined` |
-   | `getBlinkitAvailability(id)` | `{ store, units }` at the demo shopper's nearest store, or `undefined` if not stocked there |
-   | `getCart()` / `placeOrder()` | Used by the cart/checkout. Read the live cart with `useCart()` instead |
+   | Accessor                             | Returns                                                                                     |
+   | ------------------------------------ | ------------------------------------------------------------------------------------------- |
+   | `getProducts()`                      | All 30 products (fresh array, safe to sort/filter)                                          |
+   | `getProductById(id)`                 | One product, or `undefined`                                                                 |
+   | `getCategories()`                    | `{ id, label }[]` for the 6 categories                                                      |
+   | `getVouchers()`                      | All vouchers, including expired ones                                                        |
+   | `getVoucherByCode(code)`             | One voucher (case-insensitive), or `undefined`                                              |
+   | `getCoinBalance()`                   | Current Shopee Coins balance                                                                |
+   | `getUser()`                          | Demo shopper with default address                                                           |
+   | `getOrders()`                        | Orders, newest first                                                                        |
+   | `getOrderById(id)`                   | One order, or `undefined`                                                                   |
+   | `getVendors()` / `getVendorById(id)` | Brand-authorised importers (Global Picks)                                                   |
+   | `getDarkStores()`                    | Blinkit dark stores in the pilot city                                                       |
+   | `getStockRecords()`                  | Every stock line: product × dark store, with units                                          |
+   | `getStockForProduct(id)`             | One product's stock per dark store (`[]` if not at Blinkit)                                 |
+   | `getDarkStoreForPincode(pin)`        | The dark store delivering to a pincode, or `undefined`                                      |
+   | `getBlinkitAvailability(id)`         | `{ store, units }` at the demo shopper's nearest store, or `undefined` if not stocked there |
+   | `getCart()` / `placeOrder()`         | Used by the cart/checkout. Read the live cart with `useCart()` instead                      |
 
    They are synchronous, so there are no loading states to handle.
 
@@ -239,12 +251,12 @@ To pick up teammates' merged work: `git fetch origin && git merge origin/main`.
 
 ```tsx
 // Example: reading mock data in a page
-import { Link } from 'react-router'
-import { formatRupees } from '../../lib/format'
-import { getProducts } from '../../mocks'
+import { Link } from "react-router";
+import { formatRupees } from "../../lib/format";
+import { getProducts } from "../../mocks";
 
 export default function ExamplePage() {
-  const products = getProducts().filter((p) => p.isVerified)
+  const products = getProducts().filter((p) => p.isVerified);
   return (
     <ul>
       {products.map((p) => (
@@ -255,7 +267,7 @@ export default function ExamplePage() {
         </li>
       ))}
     </ul>
-  )
+  );
 }
 ```
 
@@ -275,21 +287,20 @@ export default function ExamplePage() {
   shows on `/inventory`. Brands, importers and registration numbers are fictional.
 - **Vouchers:**
 
-  | Code         | Type    | Value                | Min spend | Note             |
-  | ------------ | ------- | -------------------- | --------- | ---------------- |
-  | `WELCOME50`  | fixed   | ₹50 off              | ₹299      |                  |
-  | `SAVE10`     | percent | 10%, max ₹100        | none      |                  |
-  | `SAVE15`     | percent | 15%, max ₹150        | ₹999      |                  |
-  | `DIWALI200`  | fixed   | ₹200 off             | ₹1,499    | expires 31 Dec 2026 |
-  | `MEGA25`     | percent | 25%, max ₹300        | ₹1,999    |                  |
-  | `MONSOON100` | fixed   | ₹100 off             | ₹799      | **already expired** |
+  | Code         | Type    | Value         | Min spend | Note                |
+  | ------------ | ------- | ------------- | --------- | ------------------- |
+  | `WELCOME50`  | fixed   | ₹50 off       | ₹299      |                     |
+  | `SAVE10`     | percent | 10%, max ₹100 | none      |                     |
+  | `SAVE15`     | percent | 15%, max ₹150 | ₹999      |                     |
+  | `DIWALI200`  | fixed   | ₹200 off      | ₹1,499    | expires 31 Dec 2026 |
+  | `MEGA25`     | percent | 25%, max ₹300 | ₹1,999    |                     |
+  | `MONSOON100` | fixed   | ₹100 off      | ₹799      | **already expired** |
 
 - **Coins:** 350. **Orders:** `ORD-1001` (delivered, UPI), `ORD-1002` (shipped,
   imported, COD), `ORD-1003` (out for delivery, ShopeePay, +17 Coins).
   **Cart:** pre-filled with 3 lines (₹1,916) so checkout can be demoed
   straight away.
-- **Dark stores** list the pincodes they serve. The demo shopper (HSR Layout,
-  560102) is served by Blinkit HSR Layout, so Global Picks show "⚡ 11 min".
+- **Dark stores** list the pincodes they serve. The demo shopper (HSR Layout, 560102) is served by Blinkit HSR Layout, so Global Picks show "⚡ 11 min".
 - Placing an order deducts the coins used, credits any ShopeePay cashback,
   sends Global Picks from the nearest dark store (`OrderItem.darkStoreId`) and
   takes them out of its stock, all **in memory only**. A full page reload
@@ -324,8 +335,8 @@ The team agreed these rules on 2026-10-14:
    `min(balance, wanted)`.
 7. **Order of operations:** subtotal → voucher → shipping → coins.
 8. The payable total **never goes below ₹0**.
-9. **ShopeePay cashback** *(proposed 2026-10-27, from the 22 Oct meeting;
-   confirm the rate as a team)*: paying with ShopeePay earns **5% of the
+9. **ShopeePay cashback** _(proposed 2026-10-27, from the 22 Oct meeting;
+   confirm the rate as a team)_: paying with ShopeePay earns **5% of the
    payable total back as Coins, rounded down, max 100 per order**. Other UPI
    apps and COD earn none. It's on what the shopper actually pays, so coins
    spent never earn coins, and it never changes the total. Use
@@ -341,15 +352,15 @@ Coins auto-applied"). The shopper can change or untick both.
 The thresholds live in `DEFAULT_PRICING_RULES`. Worked example (the seeded
 cart with `SAVE15`, coins on, paid with ShopeePay):
 
-| Step                                  | Amount      |
-| ------------------------------------- | ----------- |
-| Subtotal                              | ₹1,916      |
-| SAVE15: 15% = ₹287, capped at ₹150    | −₹150       |
-| Post-voucher subtotal                 | ₹1,766      |
-| Shipping (₹1,766 ≥ ₹499)              | Free        |
-| Coins: cap = floor(10% × 1,766) = 176 | −₹176       |
-| **Total**                             | **₹1,590**  |
-| ShopeePay cashback: floor(5% × 1,590) | +79 Coins   |
+| Step                                  | Amount     |
+| ------------------------------------- | ---------- |
+| Subtotal                              | ₹1,916     |
+| SAVE15: 15% = ₹287, capped at ₹150    | −₹150      |
+| Post-voucher subtotal                 | ₹1,766     |
+| Shipping (₹1,766 ≥ ₹499)              | Free       |
+| Coins: cap = floor(10% × 1,766) = 176 | −₹176      |
+| **Total**                             | **₹1,590** |
+| ShopeePay cashback: floor(5% × 1,590) | +79 Coins  |
 
 ---
 
