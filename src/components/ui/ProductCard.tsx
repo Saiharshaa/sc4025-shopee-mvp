@@ -34,7 +34,7 @@ export default function ProductCard({ product, availability }: Props) {
         {availability && (
           <span
             className={`absolute bottom-1.5 left-1.5 rounded px-1.5 py-0.5 text-xs font-semibold ${
-              quick === undefined ? 'bg-gray-800/80 text-white' : 'bg-yellow-300 text-gray-900'
+              quick === undefined ? 'bg-gray-800/80 text-white' : 'bg-speed text-gray-900'
             }`}
           >
             {quick === undefined ? 'Out of stock nearby' : `⚡ ${quick} min`}
@@ -44,9 +44,9 @@ export default function ProductCard({ product, availability }: Props) {
 
       <div className="flex flex-1 flex-col p-2.5">
         <p className="line-clamp-2 text-sm group-hover:text-brand">{product.title}</p>
-        <p className="mt-1 flex flex-wrap gap-1 text-[11px] font-medium">
+        <p className="mt-1 flex flex-wrap gap-1 text-xs font-medium">
           {availability ? (
-            <span className="rounded border border-green-700 px-1 text-green-800">Brand-authorised</span>
+            <span className="rounded border border-trust px-1 text-trust">Brand-authorised</span>
           ) : (
             product.isVerified && <span className="rounded border border-brand px-1 text-brand">Verified</span>
           )}

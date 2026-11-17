@@ -1,16 +1,36 @@
 @import 'tailwindcss';
 
 /*
- * Theme tokens. OWNER: Person 3 (Designer) — the design system lives here and
- * in src/components/ui/. Only a brand colour is defined so the scaffold has
- * something to render with; Person 3 is free to replace all of it.
+ * Theme tokens. OWNER: Person 3 (Designer).
+ *
+ * Brand: darkened from Shopee's #ee4d2d, which is only 3.66:1 on white and fails
+ * WCAG 2.1 AA for normal text (4.5:1), the target in report Section 2.1.
+ *   brand on white        5.11:1
+ *   white on brand        5.11:1 (header)
+ *   brand on brand-light  4.63:1 (discount badge)
+ *
+ * Semantic colours give each meaning one colour:
+ * trust (authenticity), speed (delivery time), plus warning and danger states.
  */
 @theme {
-  --color-brand: #ee4d2d;
-  --color-brand-dark: #d73211;
+  --color-brand: #d0300f;
+  --color-brand-dark: #a82609;
   --color-brand-light: #fff1ed;
+
+  --color-trust: #15803d;
+  --color-trust-light: #f0fdf4;
+  --color-speed: #fde047; /* the lightning "__ min" badge, always with dark text */
+  --color-warning: #b45309; /* low stock, delays */
+  --color-warning-light: #fffbeb;
+  --color-danger: #b91c1c; /* failed payment, out of stock */
+  --color-danger-light: #fef2f2;
 }
 
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }

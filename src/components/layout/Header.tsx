@@ -38,7 +38,7 @@ export default function Header() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-2 sm:py-3">
           <Link to={role === 'partner' ? '/inventory' : '/'} className="flex-none text-xl font-bold tracking-tight">
             Shopee{' '}
-            <span className="text-sm font-medium opacity-80">{role === 'partner' ? 'Partner' : 'India'}</span>
+            <span className="text-sm font-medium">{role === 'partner' ? 'Partner' : 'India'}</span>
           </Link>
 
           {role === 'shopper' && (
@@ -76,7 +76,7 @@ export default function Header() {
 
       {role === 'shopper' && (
         <nav aria-label="Primary" className="fixed inset-x-0 bottom-0 z-20 border-t border-gray-200 bg-white sm:hidden">
-          <ul className="grid grid-cols-5 text-[11px] font-medium">
+          <ul className="grid grid-cols-5 text-xs font-medium">
             {SHOPPER_NAV.map((item) => (
               <li key={item.to}>
                 <NavLink
@@ -92,7 +92,7 @@ export default function Header() {
                   <span className="flex items-center">
                     {item.label}
                     {item.to === '/cart' && itemCount > 0 && (
-                      <span className="ml-0.5 rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+                      <span className="ml-0.5 rounded-full bg-brand px-1 text-xs font-bold text-white">
                         <span className="sr-only">, items: </span>
                         {itemCount}
                       </span>
