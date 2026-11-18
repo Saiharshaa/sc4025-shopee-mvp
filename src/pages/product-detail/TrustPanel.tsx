@@ -29,8 +29,11 @@ export default function TrustPanel({ product, vendor }: { product: Product; vend
           <span className="rounded-full border border-green-700 px-1.5 text-xs font-medium">How we check</span>
         </button>
         <dl className="mt-1 space-y-0.5 text-gray-700">
-          <Fact label="Imported and sold by">
+          <Fact label="Imported by">
             <span className="font-medium">{vendor.name}</span> <span className="text-gray-500">({vendor.legalName})</span>
+          </Fact>
+          <Fact label="Sold by">
+            <span className="font-medium">Blinkit</span>
           </Fact>
           <Fact label="CDSCO import registration">
             <span className="font-mono">{reg.number}</span>
@@ -53,15 +56,18 @@ export default function TrustPanel({ product, vendor }: { product: Product; vend
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-gray-700">
             <li>
               <strong>The brand authorises the importer.</strong> {vendor.name} is authorised to sell{' '}
-              {vendor.authorisedBrands.join(' and ')} in India.
+              {vendor.authorisedBrands.length > 1
+                ? `${vendor.authorisedBrands.slice(0, -1).join(', ')} and ${vendor.authorisedBrands.at(-1)}`
+                : vendor.authorisedBrands[0]}{' '}
+              in India.
             </li>
             <li>
               <strong>The import is registered.</strong> Imported cosmetics must be registered with CDSCO, India's drug
               and cosmetics regulator. This importer holds registration <span className="font-mono">{reg.number}</span>.
             </li>
             <li>
-              <strong>No resellers in between.</strong> Stock goes from the importer straight to the Blinkit store that
-              delivers to you, so the batch shown is the batch you receive.
+              <strong>No resellers in between.</strong> Shopee imports from the brand and sells straight to the Blinkit
+              store that delivers to you, so the batch shown is the batch you receive.
             </li>
           </ol>
           <div className="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-900">
