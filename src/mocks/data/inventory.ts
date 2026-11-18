@@ -1,34 +1,22 @@
 import type { DarkStore, StockRecord, Vendor } from '../../types'
 
 // Do not import this file directly — use the accessors in src/mocks/index.ts.
-// Global Picks supply side: brand-authorised importers own the stock, Blinkit
-// dark stores hold and deliver it. Pilot scope from the roadmap: K-beauty in
-// Bengaluru. Importers, brands, registration numbers, IECs and GSTINs are all
-// fictional.
+// Global Picks supply side: Shopee's Indian wholesale arm imports the stock
+// from the brands and sells it to Blinkit, whose dark stores hold and deliver
+// it. Pilot scope from the roadmap: K-beauty in Bengaluru. Brands, registration
+// numbers, IECs and GSTINs are all fictional.
 
 export const VENDORS: Vendor[] = [
   {
     id: 'v001',
-    name: 'K-Glow Imports',
-    legalName: 'K-Glow Imports Pvt. Ltd.',
+    name: 'Shopee India Wholesale',
+    legalName: 'Shopee India Wholesale Pvt. Ltd.',
     city: 'Bengaluru',
-    authorisedBrands: ['Haneul', 'Dalbit Lab'],
+    authorisedBrands: ['Haneul', 'Dalbit Lab', 'Bomnal', 'Mulgyeol'],
     importRegistration: { number: 'IMP/COS/2025/001472', validUntil: '2030-03-31T23:59:59+05:30' },
     iec: 'AAKCK4821M',
     gstin: '29AAKCK4821M1Z7',
     onboardedAt: '2026-08-04',
-  },
-  {
-    id: 'v002',
-    name: 'Seoul Shelf India',
-    legalName: 'Seoul Shelf India LLP',
-    city: 'Mumbai',
-    authorisedBrands: ['Bomnal', 'Mulgyeol'],
-    // Due for renewal soon, so the inventory view has a warning to show.
-    importRegistration: { number: 'IMP/COS/2022/000318', validUntil: '2027-01-15T23:59:59+05:30' },
-    iec: 'ABRFS7310Q',
-    gstin: '27ABRFS7310Q1ZK',
-    onboardedAt: '2026-09-15',
   },
 ]
 
@@ -41,7 +29,7 @@ export const DARK_STORES: DarkStore[] = [
 // Mix of healthy, low (under 7 days of inventory at avgDailySales) and
 // out-of-stock lines so every status shows up on the partner dashboard.
 export const STOCK: StockRecord[] = [
-  // K-Glow Imports
+  // Haneul and Dalbit Lab
   { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-hsr', units: 24, avgDailySales: 3.5, lastRestockedAt: '2026-10-24T06:30:00+05:30' },
   { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-kor', units: 18, avgDailySales: 3.2, lastRestockedAt: '2026-10-24T07:10:00+05:30' },
   { vendorId: 'v001', productId: 'p023', darkStoreId: 'ds-ind', units: 4, avgDailySales: 2.4, lastRestockedAt: '2026-10-19T06:45:00+05:30' },
@@ -56,18 +44,18 @@ export const STOCK: StockRecord[] = [
   { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-kor', units: 10, avgDailySales: 0.9, lastRestockedAt: '2026-11-12T07:10:00+05:30' },
   { vendorId: 'v001', productId: 'p028', darkStoreId: 'ds-ind', units: 8, avgDailySales: 0.7, lastRestockedAt: '2026-11-10T06:45:00+05:30' },
 
-  // Seoul Shelf India
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-hsr', units: 20, avgDailySales: 2, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-kor', units: 0, avgDailySales: 1.8, lastRestockedAt: '2026-10-15T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p026', darkStoreId: 'ds-ind', units: 11, avgDailySales: 1.4, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-hsr', units: 8, avgDailySales: 0.9, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-kor', units: 6, avgDailySales: 0.8, lastRestockedAt: '2026-10-22T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p027', darkStoreId: 'ds-ind', units: 5, avgDailySales: 0.6, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
+  // Bomnal and Mulgyeol
+  { vendorId: 'v001', productId: 'p026', darkStoreId: 'ds-hsr', units: 20, avgDailySales: 2, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p026', darkStoreId: 'ds-kor', units: 0, avgDailySales: 1.8, lastRestockedAt: '2026-10-15T08:20:00+05:30' },
+  { vendorId: 'v001', productId: 'p026', darkStoreId: 'ds-ind', units: 11, avgDailySales: 1.4, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p027', darkStoreId: 'ds-hsr', units: 8, avgDailySales: 0.9, lastRestockedAt: '2026-10-22T08:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p027', darkStoreId: 'ds-kor', units: 6, avgDailySales: 0.8, lastRestockedAt: '2026-10-22T08:20:00+05:30' },
+  { vendorId: 'v001', productId: 'p027', darkStoreId: 'ds-ind', units: 5, avgDailySales: 0.6, lastRestockedAt: '2026-10-22T09:00:00+05:30' },
   // Out of stock at HSR (the demo shopper's store), so US1/US3's "Out of stock" + "Notify me" path shows.
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-hsr', units: 0, avgDailySales: 1.5, lastRestockedAt: '2026-11-02T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-kor', units: 9, avgDailySales: 1.4, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p029', darkStoreId: 'ds-ind', units: 6, avgDailySales: 1, lastRestockedAt: '2026-11-12T09:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-hsr', units: 16, avgDailySales: 1.2, lastRestockedAt: '2026-11-12T08:00:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-kor', units: 11, avgDailySales: 1.1, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
-  { vendorId: 'v002', productId: 'p030', darkStoreId: 'ds-ind', units: 3, avgDailySales: 0.8, lastRestockedAt: '2026-11-10T09:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p029', darkStoreId: 'ds-hsr', units: 0, avgDailySales: 1.5, lastRestockedAt: '2026-11-02T08:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p029', darkStoreId: 'ds-kor', units: 9, avgDailySales: 1.4, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v001', productId: 'p029', darkStoreId: 'ds-ind', units: 6, avgDailySales: 1, lastRestockedAt: '2026-11-12T09:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p030', darkStoreId: 'ds-hsr', units: 16, avgDailySales: 1.2, lastRestockedAt: '2026-11-12T08:00:00+05:30' },
+  { vendorId: 'v001', productId: 'p030', darkStoreId: 'ds-kor', units: 11, avgDailySales: 1.1, lastRestockedAt: '2026-11-12T08:20:00+05:30' },
+  { vendorId: 'v001', productId: 'p030', darkStoreId: 'ds-ind', units: 3, avgDailySales: 0.8, lastRestockedAt: '2026-11-10T09:00:00+05:30' },
 ]

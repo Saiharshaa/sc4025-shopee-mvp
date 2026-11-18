@@ -66,8 +66,8 @@ export default function ProductTabs({ product, vendor, availability }: Props) {
         ) : vendor && availability ? (
           <dl className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
             <Item label="Seller of record">
-              {vendor.legalName}
-              <span className="block text-xs text-gray-500">Brand-authorised importer</span>
+              Blinkit
+              <span className="block text-xs text-gray-500">Imported by {vendor.legalName}</span>
             </Item>
             <Item label="Dispatching store">
               {availability.store.name}
